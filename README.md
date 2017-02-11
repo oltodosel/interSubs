@@ -11,7 +11,7 @@ Can extend time of subs showing; for slow readers
     
     00:02:23,046 --> 00:02:25,990
     bla bla
-    00:0228,020 --> 00:02:33,084
+    00:02:28,020 --> 00:02:33,084
     waka waka
     
     00:02:23,046 --> 00:02:28,020
