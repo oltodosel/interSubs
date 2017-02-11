@@ -18,8 +18,8 @@ function s1()
     mp.set_property("input-ipc-server", '/tmp/mpv_socket')
 
     -- without visible subs won't work
-	sfs1 = mp.get_property_number("sub-font-size")
-	sfs2 = mp.get_property_number("sub-scale")
+    sfs1 = mp.get_property_number("sub-font-size")
+    sfs2 = mp.get_property_number("sub-scale")
     mp.set_property("sub-visibility", "yes")
     mp.set_property_number("sub-font-size", 1)
     mp.set_property_number("sub-scale", 0.01)
