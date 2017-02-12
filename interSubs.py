@@ -307,6 +307,7 @@ def stripsd(word):
 
 #########################################
 
+print('[py part] Starting interSubs ...')
 pth = os.path.expanduser('~/.config/mpv/scripts/')
 os.chdir(pth)
 
