@@ -13,6 +13,7 @@ function s1()
     end
 	running = true
     mp.command('show-text "Starting interSubs ..."')
+    mp.msg.warn('Starting interSubs ...')
 
     -- setting up socket to control mpv
     mp.set_property("input-ipc-server", '/tmp/mpv_socket')
@@ -46,6 +47,7 @@ function s_rm()
     mp.set_property_number("sub-scale", sfs2)
 	
     mp.command('show-text "Quitting interSubs ..."')
+    mp.msg.warn('Quitting interSubs ...')
     os.remove(sub_file)
     os.execute('pkill -f "python3 ' .. pyname:gsub("~", os.getenv("HOME")) .. '"')
 end
