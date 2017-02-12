@@ -27,6 +27,7 @@ Requirements
    - Python 3
    - Lua
    - mpv (I don't know if it will work with mpv front-ends.)
+   - pkill
    - optional: xdotool (for hiding subtitles when needed) 
    - optional: chromium (for external translation, other browser can be specified)
    - optional: wget (for listening to pronunciation)
