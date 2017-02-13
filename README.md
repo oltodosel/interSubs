@@ -24,9 +24,10 @@ Can extend time of subs showing; for slow readers
 
 Requirements
 ------------
-   - Python 3
-   - Lua
    - mpv (I don't know if it will work with mpv front-ends.)
+   - Python 3
+   - Tcl/Tk 8.6.6
+   - Lua
    - pkill
    - optional: xdotool (for hiding subtitles when needed) 
    - optional: chromium (for external translation, other browser can be specified)
@@ -37,6 +38,8 @@ Installation
 ```
 mv interSubs.py interSubs.lua ~/.config/mpv/scripts/
 Edit configuration in interSubs.py
+For Mac edit configuration at interSubs.lua
+For Windows - port it yourself.
 ```
 Usage
 -----
