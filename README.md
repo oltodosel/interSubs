@@ -29,7 +29,7 @@ Requirements
    - Tcl/Tk 8.6.6
    - Lua
    - pkill
-   - optional: xdotool (for hiding subtitles when needed) 
+   - optional: xdotool (for hiding subtitles when minimizing mpv or switching window) 
    - optional: chromium (for external translation, other browser can be specified)
    - optional: wget (for listening to pronunciation)
 
