@@ -5,8 +5,11 @@ from tkinter import *
 from time import sleep
 from urllib.parse import quote
 from random import shuffle
+import subprocess
+from json import loads
 
 #########################################
+# v. 1.2
 # Interactive subtitles for `mpv` for language learners.
 #####
 # `mv interSubs.py interSubs.lua ~/.config/mpv/scripts/`
@@ -15,8 +18,9 @@ from random import shuffle
 # mouse over - popup with translation
 # left click - cmd with word
 # right click - listen to word - listen(word)
-# wheel - font size +1/-1
-# shift + wheel - subs position +5/-5
+# wheel scroll- font size +1/-1
+# shift + wheel scroll - subs position +5/-5px.
+# wheel click - cycle through auto_pause options
 #########################################
 
 ### Configuration #######################
@@ -38,31 +42,38 @@ focus_checking_time = .5			# interval in seconds between checking if mpv is in f
 
 external_dictionary_cmd_on_click = 'chromium "http://www.linguee.com/german-english/search?source=german&query=${word}"'	# firefox "https://en.wiktionary.org/wiki/${word}"
 
-font1 = ("Trebuchet MS", 40)		# subtitles (font, size)
-font2 = ("Trebuchet MS", 30)		# translation
-font3 = ("Trebuchet MS", 26)		# morphology
-font_color1 = '#FFFFFF'				# subtitles
-font_color2 = '#DCDCCC'				# original language
-font_color3 = '#8B8F88'				# translation
-font_color4 = '#CA8200'				# morphology
-font_color5 = '#1E90FF'				# nouns, masculine
-font_color6 = '#BD3030'				# nouns, feminine
-font_color7 = '#6DB56D'				# nouns, neuter
+font1 = ("Trebuchet MS", 38)		# subtitles (font, size)
+font2 = ("Trebuchet MS", 30)		# [popup] original language & translation
+font3 = ("Trebuchet MS", 26)		# [popup] morphology
+font_color1 = '#BAC4D6'				# subtitles
+font_color2 = '#DCDCCC'				# [popup] original language
+font_color3 = '#8B8F88'				# [popup] translation
+font_color4 = '#CA8200'				# [popup] morphology
+font_color5 = '#1E90FF'				# [popup] nouns, masculine
+font_color6 = '#BD3030'				# [popup] nouns, feminine
+font_color7 = '#6DB56D'				# [popup] nouns, neuter
 bg_color1 = '#000000'				# subtitles
-bg_color2 = '#2C2C2C'				# translation
+bg_color2 = '#2C2C2C'				# translation popup
 
-subs_bottom_padding = 30
+subs_bottom_padding = 10
 popup_ext_n_int_padding = 6
 
 sub_file = '/tmp/mpv_sub'
 
 translation_function_name = 'pons'	# or other function's name you might write that will return ([[word, translation]..], [morphology = '', gender = ''])
 
+# for going through lines step by step
+auto_pause_min_words = 10			# skip pausing when subs are less then X words
+auto_pause = 0						# 0 - don't pause
+									# 1 - pause after subs change
+									# 2 - pause before subs change
+									# wheel click on interSubs cycles through options
+
 #### End of configuration ###############
 
 def render_subtitles():
 	global frame, subs_hight
-	
+
 	try:
 		popup.destroy()
 	except:
@@ -71,22 +82,23 @@ def render_subtitles():
 		frame.destroy()
 	except:
 		pass
-	
+
 	frame = Frame(window)
 	frame.configure(background = bg_color1, padx = 2, pady = 0)
 	frame.pack()
-	
+
 	frame.bind("<Enter>", mpv_pause)
 	frame.bind("<Leave>", mpv_resume)
 	frame.bind("<Button-4>", wheel_ev)		# binding frame to cover whitespaces
 	frame.bind("<Button-5>", wheel_ev)
-	
+	frame.bind("<Button-2>", wheel_click)
+
 	# putting first line without its own frame won't center it when second line is longer
 	frame1 = Frame(frame)
 	frame1.pack()
 	frame2 = Frame(frame)
 	frame2.pack()
-			
+
 	for i1, line in enumerate(subs.split('\n')):
 		for i2, word in enumerate(line.split(' ')):
 			if i2 != len(line.split(' ')) - 1:
@@ -103,6 +115,7 @@ def render_subtitles():
 			bb.bind("<Enter>", lambda event, arg = word: render_popup(event, arg))
 			bb.bind("<Leave>", lambda event: popup.destroy())
 			bb.bind("<Button-1>", lambda event, arg = word: os.system(external_dictionary_cmd_on_click.replace('${word}', stripsd(arg))))
+			bb.bind("<Button-2>", wheel_click)
 			bb.bind("<Button-3>", lambda event, arg = word: listen(arg))
 			bb.bind("<Button-4>", wheel_ev)
 			bb.bind("<Button-5>", wheel_ev)
@@ -121,36 +134,36 @@ def render_subtitles():
 
 def render_popup(event, word = 'hund'):
 	global popup
-	
+
 	pairs, word_descr = globals()[translation_function_name](stripsd(word))
-	
+
 	if not len(pairs):
 		#pairs = [['[Not found]', '']]
 		return
-	
+
 	if randomize_translations:
 		tmp_pairs = pairs[1:]
 		shuffle(tmp_pairs)
 		pairs = [pairs[0]] + tmp_pairs
-	
+
 	popup = Toplevel(root)
 	popup.geometry('+%d+%d' % (ws+999, hs+999))
 	popup.overrideredirect(1)
 	popup.configure(background = bg_color2, padx = popup_ext_n_int_padding, pady = popup_ext_n_int_padding)
-	
+
 	wrplgth = ws - ws/3
-	
+
 	for i, pair in enumerate(pairs):
 		if i == number_of_translations:
 			break
-			
+
 		Label(popup, text = pair[0], font = font2, borderwidth = 0, padx = popup_ext_n_int_padding, pady = 0, background = bg_color2, foreground = font_color2, highlightthickness = 0, wraplength = wrplgth, justify = "left").pack(side = "top", anchor = "w")
 
 		Label(popup, text = pair[1], font = font2, borderwidth = 0, padx = popup_ext_n_int_padding, pady = 0, background = bg_color2, foreground = font_color3, highlightthickness = 0, wraplength = wrplgth, justify = "left").pack(side = "top", anchor = "w")
 
 		# couldn't control padding of one side, thus:
 		Label(popup, pady = 0, background = bg_color2).pack(side = "top")
-		
+
 	if len(word_descr[0]):
 		if word_descr[1] == 'm':
 			word_descr_color = font_color5
@@ -167,10 +180,10 @@ def render_popup(event, word = 'hund'):
 
 	w = popup.winfo_width() + popup_ext_n_int_padding
 	h = popup.winfo_height() + popup_ext_n_int_padding
-	
+
 	if w > ws - popup_ext_n_int_padding * 2:
 		w = ws - popup_ext_n_int_padding * 2
-	
+
 	x = event.x_root-w/5
 	if x+w > ws-popup_ext_n_int_padding:
 		x = ws - w - popup_ext_n_int_padding
@@ -185,7 +198,7 @@ def pons(word):
 		url = 'http://en.pons.com/translate?q=%s&l=%s%s&in=%s' % (quote(word), lang_from, lang_to, lang_from)
 	else:
 		url = 'http://en.pons.com/translate?q=%s&l=%s%s&in=%s' % (quote(word), lang_to, lang_from, lang_from)
-	
+
 	pairs = []
 	try:
 		if save_translations:
@@ -205,7 +218,7 @@ def pons(word):
 		p = p.replace('&#39;',"'")
 		p = p.replace('<acronym title="informal">fam</acronym>', ' ')
 		p = re.sub('<span class="flag .*?</a>', ' ', p)
-		
+
 		x = re.findall('<dt>(.*?)</dt>.*?<dd>(.*?)</dd>', p, re.DOTALL)
 
 		for c in x:
@@ -238,7 +251,7 @@ def pons(word):
 			print('\n\n'.join(e[0] + '\n' + e[1] for e in pairs), file=open('urls/' + url.replace('/',"-"), 'a'))
 			print('\n'+'=====/////-----'+'\n', file=open('urls/' + url.replace('/',"-"), 'a'))
 			print(word_descr, file=open('urls/' + url.replace('/',"-"), 'a'))
-			
+
 	if len(word_descr):
 		if word_descr.split(' ')[-1] == 'm':
 			word_descr_gen = [word_descr[:-2], 'm']
@@ -255,7 +268,7 @@ def pons(word):
 
 def wheel_ev(event):
 	global subs_bottom_padding, font1
-	
+
 	# event.state: Ctrl == 4, Shift == 1, None == 0
 	if event.state == 0:
 		if event.num == 4:
@@ -267,35 +280,48 @@ def wheel_ev(event):
 			subs_bottom_padding += 5
 		else:
 			subs_bottom_padding -= 5
-	
+
 	# for live resize/reposition
 	beysc()
 	render_subtitles()
+
+def wheel_click(event):
+	global auto_pause
+	if auto_pause == 2:
+		auto_pause = 0
+	else:
+		auto_pause += 1
+	
+	os.system('echo \'{ "command": ["show-text", "auto_pause: ' + str(auto_pause) + '"] }\' | socat - /tmp/mpv_socket > /dev/null')
 
 def listen(word):
 	if lang_from + lang_to in pons_combos:
 		url = 'http://en.pons.com/translate?q=%s&l=%s%s&in=%s' % (quote(word), lang_from, lang_to, lang_from)
 	else:
 		url = 'http://en.pons.com/translate?q=%s&l=%s%s&in=%s' % (quote(word), lang_to, lang_from, lang_from)
-	
+
 	p = requests.get(url, headers={'User-Agent': 'Mozilla/5.0'}).text
 	x = re.findall('<dl id="([a-zA-Z0-9]*?)" class="dl-horizontal kne(.*?)</dl>', p, re.DOTALL)
 	x2 = re.findall('class="audio tts trackable trk-audio" data-pons-lang="(.*?)"', x[0][1])
-	
+
 	for l in x2:
 		if lang_from in l:
 			mp3 = 'http://sounds.pons.com/audio_tts/%s/%s' % (l, x[0][0])
 			break
-	
-	os.system('(cd /tmp; wget ' + mp3 + '; mpv --loop=2 --volume=40 --force-window=no ' + mp3.split('/')[-1] + '; rm ' + mp3.split('/')[-1] + ') &')
 
-def mpv_pause(e):
-	if pause_during_translation:
-		os.system('echo \'{ "command": ["set_property", "pause", true] }\' | socat - /tmp/mpv_socket')
+	os.system('(cd /tmp; wget ' + mp3 + '; mpv --loop=1 --volume=40 --force-window=no ' + mp3.split('/')[-1] + '; rm ' + mp3.split('/')[-1] + ') &')
 
-def mpv_resume(e):
+def mpv_pause(e = None):
 	if pause_during_translation:
-		os.system('echo \'{ "command": ["set_property", "pause", false] }\' | socat - /tmp/mpv_socket')
+		os.system('echo \'{ "command": ["set_property", "pause", true] }\' | socat - /tmp/mpv_socket > /dev/null')
+
+def mpv_resume(e = None):
+	if pause_during_translation:
+		os.system('echo \'{ "command": ["set_property", "pause", false] }\' | socat - /tmp/mpv_socket > /dev/null')
+
+def mpv_pause_status():
+	stdoutdata = subprocess.getoutput('echo \'{ "command": ["get_property", "pause"] }\' | socat - /tmp/mpv_socket')
+	return loads(stdoutdata)['data']
 
 # render beyond the screen
 def beysc():
@@ -341,7 +367,7 @@ inc = 0
 while 1:
 	sleep(update_time)
 	window.update()
-	
+
 	# hide subs when mpv isn't in focus
 	if inc * update_time > focus_checking_time:
 		try:
@@ -355,22 +381,31 @@ while 1:
 			continue
 		inc = 0
 	inc += 1
-	
+
 	if was_hidden:
 		was_hidden = 0
 		render_subtitles()
 		continue
-	
+
 	try:
 		tmp_file_subs = open(sub_file).read()
 	except:
 		continue
-		
+
 	if extend_subs_duration2max and not len(tmp_file_subs):
 		continue
-	
+
 	if tmp_file_subs != subs:
+		if auto_pause == 2:
+			if len(subs.split(' ')) > auto_pause_min_words - 1:
+				mpv_pause()
+				while mpv_pause_status():
+					sleep(update_time)
+					
 		subs = tmp_file_subs
-		
 		beysc()
 		render_subtitles()
+		
+		if auto_pause == 1:	
+			if len(subs.split(' ')) > auto_pause_min_words - 1:
+				mpv_pause()
