@@ -46,7 +46,8 @@ Usage
 - Start video with mpv & select subtitles.
 - Press F5 to start/stop interSubs.
 - Point cursor over the word to get popup with translation.
-- Click on the word to look it up on another translator in your browser.
-- Right-click on the word to hear its pronunciation, twice.
+- Click on the word to look it up on another translator in the browser.
+- Right-click on the word to hear its pronunciation.
 - Wheel resizes subtitles.
 - Wheel+Shift changes its vertical position.
+- Wheel-click cycles through auto_pause options.
