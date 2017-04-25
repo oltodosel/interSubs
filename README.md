@@ -1,6 +1,8 @@
 interSubs
 =========
 
+v. 1.3
+
 Interactive subtitles for `mpv`, that was made to help study languages. Easily tweaked and customizable.
 
 Uses http://pons.com/ for translation and http://linguee.com/ redirecting to browser by click.
