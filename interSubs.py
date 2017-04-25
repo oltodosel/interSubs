@@ -9,7 +9,7 @@ import subprocess
 from json import loads
 
 #########################################
-# v. 1.2
+# v. 1.3
 # Interactive subtitles for `mpv` for language learners.
 #####
 # `mv interSubs.py interSubs.lua ~/.config/mpv/scripts/`
@@ -68,6 +68,8 @@ auto_pause = 0						# 0 - don't pause
 									# 1 - pause after subs change
 									# 2 - pause before subs change
 									# wheel click on interSubs cycles through options
+
+hide_when_not_fullscreen = 1		# show interSubs only in fullscreen
 
 #### End of configuration ###############
 
@@ -291,7 +293,7 @@ def wheel_click(event):
 		auto_pause = 0
 	else:
 		auto_pause += 1
-	
+
 	os.system('echo \'{ "command": ["show-text", "auto_pause: ' + str(auto_pause) + '"] }\' | socat - /tmp/mpv_socket > /dev/null')
 
 def listen(word):
@@ -321,6 +323,10 @@ def mpv_resume(e = None):
 
 def mpv_pause_status():
 	stdoutdata = subprocess.getoutput('echo \'{ "command": ["get_property", "pause"] }\' | socat - /tmp/mpv_socket')
+	return loads(stdoutdata)['data']
+
+def mpv_fullscreen_status():
+	stdoutdata = subprocess.getoutput('echo \'{ "command": ["get_property", "fullscreen"] }\' | socat - /tmp/mpv_socket')
 	return loads(stdoutdata)['data']
 
 # render beyond the screen
@@ -364,14 +370,15 @@ beysc()
 
 was_hidden = 0
 inc = 0
+c3 = 0
 while 1:
 	sleep(update_time)
 	window.update()
 
-	# hide subs when mpv isn't in focus
+	# hide subs when mpv isn't in focus or in fullscreen
 	if inc * update_time > focus_checking_time:
 		try:
-			if 'mpv' not in subprocess.check_output(['xdotool', 'getwindowfocus', 'getwindowname']).decode("utf8", "ignore"):
+			if 'mpv' not in subprocess.check_output(['xdotool', 'getwindowfocus', 'getwindowname']).decode("utf8", "ignore") or (hide_when_not_fullscreen and not mpv_fullscreen_status()):
 				was_hidden = 1
 				beysc()
 				frame.destroy()
@@ -395,17 +402,23 @@ while 1:
 	if extend_subs_duration2max and not len(tmp_file_subs):
 		continue
 
-	if tmp_file_subs != subs:
+	while tmp_file_subs != subs:
 		if auto_pause == 2:
-			if len(subs.split(' ')) > auto_pause_min_words - 1:
+			if not c3 and len(subs.replace('\n', ' ').split(' ')) > auto_pause_min_words - 1 and not mpv_pause_status():
 				mpv_pause()
-				while mpv_pause_status():
-					sleep(update_time)
-					
+				c3 = 1
+
+			if c3 and mpv_pause_status():
+				break
+
+			c3 = 0
+
 		subs = tmp_file_subs
 		beysc()
 		render_subtitles()
-		
-		if auto_pause == 1:	
-			if len(subs.split(' ')) > auto_pause_min_words - 1:
+
+		if auto_pause == 1:
+			if len(subs.replace('\n', ' ').split(' ')) > auto_pause_min_words - 1:
 				mpv_pause()
+
+		break
