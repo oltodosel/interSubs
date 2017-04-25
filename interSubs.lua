@@ -1,11 +1,13 @@
--- default keybinding: F5
--- dir in which interSubs will start automatically
-autostart_in = "/med/p/TV/"
+-- v. 1.3
 
-sub_file = "/tmp/mpv_sub"
+-- default keybinding: F5
+-- dirs in which interSubs will start automatically
+autostart_in = {'/med/p/TV/', '/med/German/TV/'}
+
+sub_file = '/tmp/mpv_sub'
 pyname = '~/.config/mpv/scripts/interSubs.py'
 -- for Mac change python3 to python or pythonw
-start_command = 'python3 ' .. pyname:gsub("~", os.getenv("HOME"))
+start_command = 'python3 ' .. pyname:gsub('~', os.getenv('HOME'))
 
 function s1()
 	if running == true then
@@ -54,10 +56,12 @@ function s_rm()
 end
 
 function started()
-	if mp.get_property("path"):find('^' .. autostart_in) ~= nil then
-		s1()
+	for kk, pp in pairs(autostart_in) do
+		if mp.get_property("path"):find(pp) or mp.get_property("working-directory"):find(pp) then
+			s1()
+		end
 	end
 end
 
-mp.add_forced_key_binding("f5", "111", s1)
+mp.add_forced_key_binding("f5", "start-stop-interSubs", s1)
 mp.register_event("start-file", started)
