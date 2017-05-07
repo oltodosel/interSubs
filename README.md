@@ -1,7 +1,7 @@
 interSubs
 =========
 
-v. 1.3
+v. 1.4
 
 Interactive subtitles for `mpv`, that was made to help study languages. Easily tweaked and customizable.
 
@@ -50,6 +50,7 @@ Usage
 - Point cursor over the word to get popup with translation.
 - Click on the word to look it up on another translator in the browser.
 - Right-click on the word to hear its pronunciation.
-- Wheel resizes subtitles.
-- Wheel+Shift changes its vertical position.
-- Wheel-click cycles through auto_pause options.
+- Wheel - scroll through transitions.
+- Wheel+Shift - resize subtitles.
+- Wheel+Ctrl - change subtitles' vertical position.
+- Wheel-click - cycle through auto_pause options.
