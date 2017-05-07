@@ -2,6 +2,7 @@ interSubs
 =========
 
 v. 1.4
+[added scrolling through transitions]
 
 Interactive subtitles for `mpv`, that was made to help study languages. Easily tweaked and customizable.
 
