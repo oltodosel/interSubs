@@ -9,7 +9,7 @@ import subprocess
 from json import loads
 
 #########################################
-# v. 1.3
+# v. 1.4
 # Interactive subtitles for `mpv` for language learners.
 #####
 # `mv interSubs.py interSubs.lua ~/.config/mpv/scripts/`
@@ -18,8 +18,9 @@ from json import loads
 # mouse over - popup with translation
 # left click - cmd with word
 # right click - listen to word - listen(word)
-# wheel scroll- font size +1/-1
-# shift + wheel scroll - subs position +5/-5px.
+# wheel scroll - on the word - go through translations; works only when translations are saved - save_translations = 1
+# shift + wheel scroll - font size +1/-1
+# ctrl + wheel scroll - subs position +5/-5px.
 # wheel click - cycle through auto_pause options
 #########################################
 
@@ -30,19 +31,19 @@ lang_to = 'en'						# translate to language
 
 pause_during_translation = 1		# True/False == 1/0
 extend_subs_duration2max = 1		# True/False # don't hide subtitle when its time is up and keep it on screen until the next line
-######
+
 save_translations = 1				# True/False # saving to ~/.config/mpv/scripts/urls/
-randomize_translations = 0			# True/False # every translation(example of usage in Pons) but first will be shuffled
+randomize_translations = 0			# True/False # every translation(example of usage in Pons) but first will be shuffled # scrolling through transitions would be disabled
 
 number_of_translations = 4			# number of translations in popup
-number_of_translations_to_save = 20	# number of translations to save in file
+number_of_translations_to_save = 0	# number of translations to save in files for each word; 0 - to save all
 
 update_time = .03					# interval in seconds between checking for the next subtitle
 focus_checking_time = .5			# interval in seconds between checking if mpv is in focus using `xdotool`
 
 external_dictionary_cmd_on_click = 'chromium "http://www.linguee.com/german-english/search?source=german&query=${word}"'	# firefox "https://en.wiktionary.org/wiki/${word}"
 
-font1 = ("Trebuchet MS", 38)		# subtitles (font, size)
+font1 = ("Trebuchet MS", 40)		# subtitles (font, size)
 font2 = ("Trebuchet MS", 30)		# [popup] original language & translation
 font3 = ("Trebuchet MS", 26)		# [popup] morphology
 font_color1 = '#BAC4D6'				# subtitles
@@ -69,12 +70,12 @@ auto_pause = 0						# 0 - don't pause
 									# 2 - pause before subs change
 									# wheel click on interSubs cycles through options
 
-hide_when_not_fullscreen = 1		# show interSubs only in fullscreen
+hide_when_not_fullscreen = 1		# True/False # show interSubs only in fullscreen
 
 #### End of configuration ###############
 
 def render_subtitles():
-	global frame, subs_hight
+	global frame, subs_hight, scroll
 
 	try:
 		popup.destroy()
@@ -85,8 +86,13 @@ def render_subtitles():
 	except:
 		pass
 
+	if not len(subs):
+		return
+
+	scroll = {}
+
 	frame = Frame(window)
-	frame.configure(background = bg_color1, padx = 2, pady = 0)
+	frame.configure(background = bg_color1, padx = 6, pady = 0)
 	frame.pack()
 
 	frame.bind("<Enter>", mpv_pause)
@@ -119,8 +125,8 @@ def render_subtitles():
 			bb.bind("<Button-1>", lambda event, arg = word: os.system(external_dictionary_cmd_on_click.replace('${word}', stripsd(arg))))
 			bb.bind("<Button-2>", wheel_click)
 			bb.bind("<Button-3>", lambda event, arg = word: listen(arg))
-			bb.bind("<Button-4>", wheel_ev)
-			bb.bind("<Button-5>", wheel_ev)
+			bb.bind("<Button-4>", lambda event, arg = word: wheel_ev(event, arg))
+			bb.bind("<Button-5>", lambda event, arg = word: wheel_ev(event, arg))
 
 	window.update_idletasks()
 
@@ -134,8 +140,14 @@ def render_subtitles():
 	window.geometry('%dx%d+%d+%d' % (w, h, x, y))
 	window.geometry('')
 
-def render_popup(event, word = 'hund'):
+def render_popup(event, word = 'hund', scroll = {}):
 	global popup
+
+	try:
+		popup.geometry('%dx%d+%d+%d' % (0, 0, 0, 0))
+		#popup.destroy()
+	except:
+		pass
 
 	pairs, word_descr = globals()[translation_function_name](stripsd(word))
 
@@ -143,10 +155,17 @@ def render_popup(event, word = 'hund'):
 		#pairs = [['[Not found]', '']]
 		return
 
+	#pairs = [ [ str(i) + ' ' + pair[0], pair[1] ] for i, pair in enumerate(pairs) ]
+
 	if randomize_translations:
 		tmp_pairs = pairs[1:]
 		shuffle(tmp_pairs)
 		pairs = [pairs[0]] + tmp_pairs
+	elif word in scroll:
+		if len(pairs[scroll[word]:]) > number_of_translations + 1:
+			pairs = pairs[scroll[word]:]
+		else:
+			pairs = pairs[-number_of_translations:]
 
 	popup = Toplevel(root)
 	popup.geometry('+%d+%d' % (ws+999, hs+999))
@@ -240,7 +259,7 @@ def pons(word):
 
 			pairs.append([f1, f2])
 
-			if len(pairs) > number_of_translations_to_save:
+			if number_of_translations_to_save and len(pairs) > number_of_translations_to_save:
 				break
 		try:
 			p = p.replace('<span class="roman">I.</span>',"")
@@ -268,16 +287,31 @@ def pons(word):
 
 	return pairs, word_descr_gen
 
-def wheel_ev(event):
-	global subs_bottom_padding, font1
+def wheel_ev(event, word = ''):
+	global subs_bottom_padding, font1, scroll
 
 	# event.state: Ctrl == 4, Shift == 1, None == 0
 	if event.state == 0:
+		if save_translations:
+			if event.num == 4:
+				if word in scroll and scroll[word] > 0:
+					scroll[word] = scroll[word] - 1
+				else:
+					scroll[word] = 0
+			else:
+				if word in scroll:
+					scroll[word] = scroll[word] + 1
+				else:
+					scroll[word] = 1
+
+			render_popup(event, word, scroll)
+			return
+	elif event.state == 1:
 		if event.num == 4:
 			font1 = (font1[0], font1[1] + 1)
 		else:
 			font1 = (font1[0], font1[1] - 1)
-	elif event.state == 1:
+	elif event.state == 4:
 		if event.num == 4:
 			subs_bottom_padding += 5
 		else:
@@ -368,6 +402,7 @@ window.configure(background = bg_color1)
 
 beysc()
 
+scroll = {}
 was_hidden = 0
 inc = 0
 c3 = 0
