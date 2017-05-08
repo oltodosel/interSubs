@@ -1,5 +1,9 @@
 #! /usr/bin/env python3
-import os, subprocess
+
+# v. 1.5
+# Interactive subtitles for `mpv` for language learners.
+
+import os, subprocess, sys
 import requests
 from tkinter import *
 from time import sleep
@@ -7,72 +11,6 @@ from urllib.parse import quote
 from random import shuffle
 import subprocess
 from json import loads
-
-#########################################
-# v. 1.4
-# Interactive subtitles for `mpv` for language learners.
-#####
-# `mv interSubs.py interSubs.lua ~/.config/mpv/scripts/`
-# `xdotool` required for hiding subs when mpv isn't active window
-#####
-# mouse over - popup with translation
-# left click - cmd with word
-# right click - listen to word - listen(word)
-# wheel scroll - on the word - go through translations; works only when translations are saved - save_translations = 1
-# shift + wheel scroll - font size +1/-1
-# ctrl + wheel scroll - subs position +5/-5px.
-# wheel click - cycle through auto_pause options
-#########################################
-
-### Configuration #######################
-
-lang_from = 'de'					# translate from language
-lang_to = 'en'						# translate to language
-
-pause_during_translation = 1		# True/False == 1/0
-extend_subs_duration2max = 1		# True/False # don't hide subtitle when its time is up and keep it on screen until the next line
-
-save_translations = 1				# True/False # saving to ~/.config/mpv/scripts/urls/
-randomize_translations = 0			# True/False # every translation(example of usage in Pons) but first will be shuffled # scrolling through transitions would be disabled
-
-number_of_translations = 4			# number of translations in popup
-number_of_translations_to_save = 0	# number of translations to save in files for each word; 0 - to save all
-
-update_time = .03					# interval in seconds between checking for the next subtitle
-focus_checking_time = .5			# interval in seconds between checking if mpv is in focus using `xdotool`
-
-external_dictionary_cmd_on_click = 'chromium "http://www.linguee.com/german-english/search?source=german&query=${word}"'	# firefox "https://en.wiktionary.org/wiki/${word}"
-
-font1 = ("Trebuchet MS", 40)		# subtitles (font, size)
-font2 = ("Trebuchet MS", 30)		# [popup] original language & translation
-font3 = ("Trebuchet MS", 26)		# [popup] morphology
-font_color1 = '#BAC4D6'				# subtitles
-font_color2 = '#DCDCCC'				# [popup] original language
-font_color3 = '#8B8F88'				# [popup] translation
-font_color4 = '#CA8200'				# [popup] morphology
-font_color5 = '#1E90FF'				# [popup] nouns, masculine
-font_color6 = '#BD3030'				# [popup] nouns, feminine
-font_color7 = '#6DB56D'				# [popup] nouns, neuter
-bg_color1 = '#000000'				# subtitles
-bg_color2 = '#2C2C2C'				# translation popup
-
-subs_bottom_padding = 10
-popup_ext_n_int_padding = 6
-
-sub_file = '/tmp/mpv_sub'
-
-translation_function_name = 'pons'	# or other function's name you might write that will return ([[word, translation]..], [morphology = '', gender = ''])
-
-# for going through lines step by step
-auto_pause_min_words = 10			# skip pausing when subs are less then X words
-auto_pause = 0						# 0 - don't pause
-									# 1 - pause after subs change
-									# 2 - pause before subs change
-									# wheel click on interSubs cycles through options
-
-hide_when_not_fullscreen = 1		# True/False # show interSubs only in fullscreen
-
-#### End of configuration ###############
 
 def render_subtitles():
 	global frame, subs_hight, scroll
@@ -92,7 +30,7 @@ def render_subtitles():
 	scroll = {}
 
 	frame = Frame(window)
-	frame.configure(background = bg_color1, padx = 6, pady = 0)
+	frame.configure(background = bg_color1, padx = 4, pady = 0)
 	frame.pack()
 
 	frame.bind("<Enter>", mpv_pause)
@@ -140,12 +78,11 @@ def render_subtitles():
 	window.geometry('%dx%d+%d+%d' % (w, h, x, y))
 	window.geometry('')
 
-def render_popup(event, word = 'hund', scroll = {}):
-	global popup
+def render_popup(event, word = 'hund'):
+	global popup, scroll
 
 	try:
 		popup.geometry('%dx%d+%d+%d' % (0, 0, 0, 0))
-		#popup.destroy()
 	except:
 		pass
 
@@ -162,10 +99,11 @@ def render_popup(event, word = 'hund', scroll = {}):
 		shuffle(tmp_pairs)
 		pairs = [pairs[0]] + tmp_pairs
 	elif word in scroll:
-		if len(pairs[scroll[word]:]) > number_of_translations + 1:
+		if len(pairs[scroll[word]:]) > number_of_translations:
 			pairs = pairs[scroll[word]:]
 		else:
 			pairs = pairs[-number_of_translations:]
+			scroll[word] = scroll[word] - 1
 
 	popup = Toplevel(root)
 	popup.geometry('+%d+%d' % (ws+999, hs+999))
@@ -213,7 +151,7 @@ def render_popup(event, word = 'hund', scroll = {}):
 
 	popup.geometry('%dx%d+%d+%d' % (w, h, x, y))
 
-# return ([[word, translation]..], [morphology = '', gender = ''])
+# returns ([[word, translation]..], [morphology = '', gender = ''])
 def pons(word):
 	if lang_from + lang_to in pons_combos:
 		url = 'http://en.pons.com/translate?q=%s&l=%s%s&in=%s' % (quote(word), lang_from, lang_to, lang_from)
@@ -304,7 +242,7 @@ def wheel_ev(event, word = ''):
 				else:
 					scroll[word] = 1
 
-			render_popup(event, word, scroll)
+			render_popup(event, word)
 			return
 	elif event.state == 1:
 		if event.num == 4:
@@ -328,7 +266,7 @@ def wheel_click(event):
 	else:
 		auto_pause += 1
 
-	os.system('echo \'{ "command": ["show-text", "auto_pause: ' + str(auto_pause) + '"] }\' | socat - /tmp/mpv_socket > /dev/null')
+	os.system('echo \'{ "command": ["show-text", "auto_pause: ' + str(auto_pause) + '"] }\' | socat - "' + mpv_socket + '" > /dev/null')
 
 def listen(word):
 	if lang_from + lang_to in pons_combos:
@@ -349,18 +287,18 @@ def listen(word):
 
 def mpv_pause(e = None):
 	if pause_during_translation:
-		os.system('echo \'{ "command": ["set_property", "pause", true] }\' | socat - /tmp/mpv_socket > /dev/null')
+		os.system('echo \'{ "command": ["set_property", "pause", true] }\' | socat - "' + mpv_socket + '" > /dev/null')
 
 def mpv_resume(e = None):
 	if pause_during_translation:
-		os.system('echo \'{ "command": ["set_property", "pause", false] }\' | socat - /tmp/mpv_socket > /dev/null')
+		os.system('echo \'{ "command": ["set_property", "pause", false] }\' | socat - "' + mpv_socket + '" > /dev/null')
 
 def mpv_pause_status():
-	stdoutdata = subprocess.getoutput('echo \'{ "command": ["get_property", "pause"] }\' | socat - /tmp/mpv_socket')
+	stdoutdata = subprocess.getoutput('echo \'{ "command": ["get_property", "pause"] }\' | socat - "' + mpv_socket + '"')
 	return loads(stdoutdata)['data']
 
 def mpv_fullscreen_status():
-	stdoutdata = subprocess.getoutput('echo \'{ "command": ["get_property", "fullscreen"] }\' | socat - /tmp/mpv_socket')
+	stdoutdata = subprocess.getoutput('echo \'{ "command": ["get_property", "fullscreen"] }\' | socat - "' + mpv_socket + '"')
 	return loads(stdoutdata)['data']
 
 # render beyond the screen
@@ -376,6 +314,10 @@ def stripsd(word):
 print('[py part] Starting interSubs ...')
 pth = os.path.expanduser('~/.config/mpv/scripts/')
 os.chdir(pth)
+exec(open('interSubs.conf.py').read())
+
+mpv_socket = sys.argv[1]
+sub_file = sys.argv[2]
 
 pons_combos = ['enes', 'enfr', 'deen', 'enpl', 'ensl', 'defr', 'dees', 'deru', 'depl', 'desl', 'deit', 'dept', 'detr', 'deel', 'dela', 'espl', 'frpl', 'itpl', 'plru', 'essl', 'frsl', 'itsl', 'enit', 'enpt', 'enru', 'espt', 'esfr', 'delb', 'dezh', 'enzh', 'eszh', 'frzh', 'denl', 'arde', 'aren', 'dade', 'csde', 'dehu', 'deno', 'desv', 'dede', 'dedx']
 
@@ -385,10 +327,7 @@ if save_translations:
 	except:
 		pass
 
-try:
-	subs = open(sub_file).read()
-except:
-	subs = ''
+#########################################
 
 root = Tk()
 root.withdraw()								# hide first window
@@ -402,6 +341,7 @@ window.configure(background = bg_color1)
 
 beysc()
 
+subs = ''
 scroll = {}
 was_hidden = 0
 inc = 0
