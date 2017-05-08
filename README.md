@@ -1,8 +1,11 @@
 interSubs
 =========
 
-v. 1.4
+v. 1.5
+
 [added scrolling through transitions]
+
+[configuration transfered to separate file]
 
 Interactive subtitles for `mpv`, that was made to help study languages. Easily tweaked and customizable.
 
@@ -27,7 +30,7 @@ Can extend time of subs showing; for slow readers
 
 Requirements
 ------------
-   - mpv (I don't know if it will work with mpv front-ends.)
+   - mpv 0.25 (I don't know if it will work with mpv front-ends.)
    - Python 3
    - Tcl/Tk 8.6.6
    - Lua
@@ -39,9 +42,9 @@ Requirements
 Installation
 ------------
 ```
-mv interSubs.py interSubs.lua ~/.config/mpv/scripts/
-Edit configuration in interSubs.py
-For Mac edit configuration at interSubs.lua
+mv interSubs.py interSubs.lua interSubs.conf.py ~/.config/mpv/scripts/
+Edit configuration file interSubs.conf.py
+For Mac also edit configuration at interSubs.lua
 For Windows - port it yourself.
 ```
 Usage
@@ -51,7 +54,7 @@ Usage
 - Point cursor over the word to get popup with translation.
 - Click on the word to look it up on another translator in the browser.
 - Right-click on the word to hear its pronunciation.
-- Wheel - scroll through transitions.
+- Wheel - scroll through transitions in popup.
 - Wheel+Shift - resize subtitles.
 - Wheel+Ctrl - change subtitles' vertical position.
 - Wheel-click - cycle through auto_pause options.
