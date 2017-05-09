@@ -35,8 +35,8 @@ function s1()
 	mp.set_property_number("sub-font-size", 1)
 	mp.set_property_number("sub-scale", 0.01)
 
-	start_command = start_command:format(pyname:gsub('~', os.getenv('HOME')), mpv_socket_2, sub_file_2)
-	os.execute(start_command .. ' &')
+	start_command_2 = start_command:format(pyname:gsub('~', os.getenv('HOME')), mpv_socket_2, sub_file_2)
+	os.execute(start_command_2 .. ' &')
 
 	mp.observe_property("sub-text", "string", s2)
 	mp.register_event("end-file", s_rm)
@@ -62,9 +62,9 @@ function s_rm()
 	mp.command('show-text "Quitting interSubs ..."')
 	mp.msg.warn('Quitting interSubs ...')
 
+	os.execute('pkill -f "' .. start_command_2 .. '"')
 	os.remove(sub_file_2)
 	os.remove(mpv_socket_2)
-	os.execute('pkill -f "' .. start_command .. '"')
 end
 
 function started()
