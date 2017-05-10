@@ -1,8 +1,7 @@
 interSubs
 =========
 
-v. 1.5
-[configuration transfered to separate file]
+v. 1.6
 
 Interactive subtitles for `mpv`, that was made to help study languages. Easily tweaked and customizable.
 
