@@ -1,6 +1,6 @@
 #! /usr/bin/env python3
 
-# v. 1.5
+# v. 1.6
 # Interactive subtitles for `mpv` for language learners.
 
 import os, subprocess, sys
@@ -56,11 +56,11 @@ def render_subtitles():
 				bb = Button(frame2)
 
 			bb.configure(text = word, font = font1, borderwidth = 0, padx = 0, pady = 0, relief = FLAT, background = bg_color1 ,foreground = font_color1, highlightthickness = 0)
-
+			word = stripsd(word)
 			bb.pack(side = LEFT)
 			bb.bind("<Enter>", lambda event, arg = word: render_popup(event, arg))
 			bb.bind("<Leave>", lambda event: popup.destroy())
-			bb.bind("<Button-1>", lambda event, arg = word: os.system(external_dictionary_cmd_on_click.replace('${word}', stripsd(arg))))
+			bb.bind("<Button-1>", lambda event, arg = word: os.system(external_dictionary_cmd_on_click.replace('${word}', arg)))
 			bb.bind("<Button-2>", wheel_click)
 			bb.bind("<Button-3>", lambda event, arg = word: listen(arg))
 			bb.bind("<Button-4>", lambda event, arg = word: wheel_ev(event, arg))
@@ -78,7 +78,7 @@ def render_subtitles():
 	window.geometry('%dx%d+%d+%d' % (w, h, x, y))
 	window.geometry('')
 
-def render_popup(event, word = 'hund'):
+def render_popup(event, word):
 	global popup, scroll
 
 	try:
@@ -86,7 +86,7 @@ def render_popup(event, word = 'hund'):
 	except:
 		pass
 
-	pairs, word_descr = globals()[translation_function_name](stripsd(word))
+	pairs, word_descr = globals()[translation_function_name](word)
 
 	if not len(pairs):
 		#pairs = [['[Not found]', '']]
@@ -116,7 +116,20 @@ def render_popup(event, word = 'hund'):
 		if i == number_of_translations:
 			break
 
-		Label(popup, text = pair[0], font = font2, borderwidth = 0, padx = popup_ext_n_int_padding, pady = 0, background = bg_color2, foreground = font_color2, highlightthickness = 0, wraplength = wrplgth, justify = "left").pack(side = "top", anchor = "w")
+		# to emphasize the exact form of the word
+		psdo_label = Frame(popup)
+		psdo_label.pack(side = "top", anchor = "w")
+		psdo_label.configure(borderwidth = 0, padx = popup_ext_n_int_padding, pady = 0, background = bg_color2)
+
+		# to ignore case on input and match it on output
+		chnks = re.split(word, pair[0], flags=re.I)
+		exct_words = re.findall(word, pair[0], flags=re.I)
+
+		for i, chnk in enumerate(chnks):
+			if len(chnk):
+				Label(psdo_label, text = chnk, font = font2, borderwidth = 0, padx = 0, pady = 0, background = bg_color2, foreground = font_color2, highlightthickness = 0, wraplength = wrplgth, justify = "left").pack(side = "left", anchor = "w")
+			if i + 1 < len(chnks):
+				Label(psdo_label, text = exct_words[i], font = font2 + ('underline',), borderwidth = 0, padx = 0, pady = 0, background = bg_color2, foreground = font_color2, highlightthickness = 0, wraplength = wrplgth, justify = "left").pack(side = "left", anchor = "w")
 
 		Label(popup, text = pair[1], font = font2, borderwidth = 0, padx = popup_ext_n_int_padding, pady = 0, background = bg_color2, foreground = font_color3, highlightthickness = 0, wraplength = wrplgth, justify = "left").pack(side = "top", anchor = "w")
 
