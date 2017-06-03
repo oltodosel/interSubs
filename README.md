@@ -28,6 +28,7 @@ Requirements
 ------------
    - mpv 0.25 (I don't know if it will work with mpv front-ends.)
    - Python 3
+   - numpy (pip)
    - Tcl/Tk 8.6.6
    - Lua
    - pkill
