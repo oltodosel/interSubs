@@ -261,7 +261,6 @@ def wheel_ev(event, word = ''):
 					scroll[word] = scroll[word] - 1
 				else:
 					scroll[word] = 0
-
 				render_popup(event, word)
 		elif event.state == 1:
 			font1 = (font1[0], font1[1] + 1)
@@ -345,6 +344,9 @@ def beysc():
 def stripsd(word):
 	return ''.join(e for e in word.strip().lower() if e.isalnum() and not e.isdigit())
 
+def stripsd2(phrase):
+	return ''.join(e for e in phrase.strip().lower() if e == ' ' or (e.isalnum() and not e.isdigit()))
+
 #########################################
 
 print('[py part] Starting interSubs ...')
@@ -415,7 +417,7 @@ while 1:
 
 	while tmp_file_subs != subs:
 		if auto_pause == 2:
-			if not c3 and len(subs.replace('\n', ' ').split(' ')) > auto_pause_min_words - 1 and not mpv_pause_status():
+			if not c3 and len(re.sub(' +', ' ', stripsd2(subs.replace('\n', ' '))).split(' ')) > auto_pause_min_words - 1 and not mpv_pause_status():
 				mpv_pause()
 				c3 = 1
 
@@ -429,7 +431,7 @@ while 1:
 		render_subtitles()
 
 		if auto_pause == 1:
-			if len(subs.replace('\n', ' ').split(' ')) > auto_pause_min_words - 1:
+			if len(re.sub(' +', ' ', stripsd2(subs.replace('\n', ' '))).split(' ')) > auto_pause_min_words - 1:
 				mpv_pause()
 
 		break
