@@ -1,9 +1,9 @@
--- v. 1.5
+-- v. 1.7
 -- Interactive subtitles for `mpv` for language learners.
 
 -- default keybinding: F5
 -- dirs in which interSubs will start automatically
-autostart_in = {'/med/p/TV/', '/med/German/TV/'}
+autostart_in = {'/med/p/TV', '/med/German', '/med/video/youtube', '/med/2see', '/med/p/Movies'}
 -- for Mac change python3 to python or pythonw
 start_command = 'python3 "%s" "%s" "%s"'
 
@@ -17,7 +17,11 @@ function s1()
 		return
 	end
 
-	mp.command('show-text "Starting interSubs ..."')
+	mp.register_event("end-file", s_rm)
+	mp.register_event("quit", s_rm)
+
+	--os.execute('notify-send -i none -t 999 "Starting interSubs ..."')
+	--mp.command('show-text "Starting interSubs ..."')
 	mp.msg.warn('Starting interSubs ...')
 
 	running = true
@@ -39,8 +43,6 @@ function s1()
 	os.execute(start_command_2 .. ' &')
 
 	mp.observe_property("sub-text", "string", s2)
-	mp.register_event("end-file", s_rm)
-	mp.register_event("quit", s_rm)
 end
 
 function s2()
@@ -59,10 +61,11 @@ function s_rm()
 	mp.set_property_number("sub-font-size", sfs1)
 	mp.set_property_number("sub-scale", sfs2)
 
-	mp.command('show-text "Quitting interSubs ..."')
+	--os.execute('notify-send -i none -t 999 "Quitting interSubs ..."')
+	--mp.command('show-text "Quitting interSubs ..."')
 	mp.msg.warn('Quitting interSubs ...')
 
-	os.execute('pkill -f "' .. start_command_2 .. '"')
+	os.execute('pkill -f "' .. mpv_socket_2 .. '"')
 	os.remove(sub_file_2)
 	os.remove(mpv_socket_2)
 end

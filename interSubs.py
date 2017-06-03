@@ -1,6 +1,6 @@
 #! /usr/bin/env python3
 
-# v. 1.6
+# v. 1.7
 # Interactive subtitles for `mpv` for language learners.
 
 import os, subprocess, sys
@@ -11,6 +11,7 @@ from urllib.parse import quote
 from random import shuffle
 import subprocess
 from json import loads
+import numpy
 
 def render_subtitles():
 	global frame, subs_hight, scroll
@@ -33,11 +34,9 @@ def render_subtitles():
 	frame.configure(background = bg_color1, padx = 4, pady = 0)
 	frame.pack()
 
-	frame.bind("<Enter>", mpv_pause)
+	frame.bind("<Enter>", mpv_pause)		# binding frame to cover whitespaces
 	frame.bind("<Leave>", mpv_resume)
-	frame.bind("<Button-4>", wheel_ev)		# binding frame to cover whitespaces
-	frame.bind("<Button-5>", wheel_ev)
-	frame.bind("<Button-2>", wheel_click)
+	frame.bind("<Button>", wheel_ev)
 
 	# putting first line without its own frame won't center it when second line is longer
 	frame1 = Frame(frame)
@@ -45,7 +44,12 @@ def render_subtitles():
 	frame2 = Frame(frame)
 	frame2.pack()
 
-	for i1, line in enumerate(subs.split('\n')):
+	if split_long_lines and len(subs.split('\n')) == 1 and len(subs.split(' ')) > split_long_lines_words_min - 1:
+		subs2 = ' '.join(numpy.array_split(subs.split(' '), 2)[0]) + '\n' + ' '.join(numpy.array_split(subs.split(' '), 2)[1])
+	else:
+		subs2 = subs
+
+	for i1, line in enumerate(subs2.split('\n')):
 		for i2, word in enumerate(line.split(' ')):
 			if i2 != len(line.split(' ')) - 1:
 				word = word + ' '
@@ -60,11 +64,7 @@ def render_subtitles():
 			bb.pack(side = LEFT)
 			bb.bind("<Enter>", lambda event, arg = word: render_popup(event, arg))
 			bb.bind("<Leave>", lambda event: popup.destroy())
-			bb.bind("<Button-1>", lambda event, arg = word: os.system(external_dictionary_cmd_on_click.replace('${word}', arg)))
-			bb.bind("<Button-2>", wheel_click)
-			bb.bind("<Button-3>", lambda event, arg = word: listen(arg))
-			bb.bind("<Button-4>", lambda event, arg = word: wheel_ev(event, arg))
-			bb.bind("<Button-5>", lambda event, arg = word: wheel_ev(event, arg))
+			bb.bind("<Button>", lambda event, arg = word: wheel_ev(event, arg))
 
 	window.update_idletasks()
 
@@ -239,38 +239,61 @@ def pons(word):
 	return pairs, word_descr_gen
 
 def wheel_ev(event, word = ''):
-	global subs_bottom_padding, font1, scroll
+	global subs_bottom_padding, font1, scroll, auto_pause, auto_pause_min_words
 
 	# event.state: Ctrl == 4, Shift == 1, None == 0
-	if event.state == 0:
-		if save_translations:
-			if event.num == 4:
+
+	if event.num == 1:
+		os.system(external_dictionary_cmd_on_click.replace('${word}', word))
+	elif event.num == 2:
+		if auto_pause == 2:
+			auto_pause = 0
+		else:
+			auto_pause += 1
+
+		os.system('echo \'{ "command": ["show-text", "auto_pause: ' + str(auto_pause) + '"] }\' | socat - "' + mpv_socket + '" > /dev/null')
+	elif event.num == 3:
+		listen(word)
+	elif event.num == 4:
+		if event.state == 0:
+			if save_translations:
 				if word in scroll and scroll[word] > 0:
 					scroll[word] = scroll[word] - 1
 				else:
 					scroll[word] = 0
-			else:
+
+				render_popup(event, word)
+		elif event.state == 1:
+			font1 = (font1[0], font1[1] + 1)
+			beysc()
+			render_subtitles()
+		elif event.state == 4:
+			subs_bottom_padding += 5
+			beysc()
+			render_subtitles()
+	elif event.num == 5:
+		if event.state == 0:
+			if save_translations:
 				if word in scroll:
 					scroll[word] = scroll[word] + 1
 				else:
 					scroll[word] = 1
-
-			render_popup(event, word)
-			return
-	elif event.state == 1:
-		if event.num == 4:
-			font1 = (font1[0], font1[1] + 1)
-		else:
+				render_popup(event, word)
+		elif event.state == 1:
 			font1 = (font1[0], font1[1] - 1)
-	elif event.state == 4:
-		if event.num == 4:
-			subs_bottom_padding += 5
-		else:
+			beysc()
+			render_subtitles()
+		elif event.state == 4:
 			subs_bottom_padding -= 5
+			beysc()
+			render_subtitles()
+	elif event.num == 6:
+		auto_pause_min_words = auto_pause_min_words - 1
+		os.system('echo \'{ "command": ["show-text", "auto_pause_min_words: ' + str(auto_pause_min_words) + '"] }\' | socat - "' + mpv_socket + '" > /dev/null')
+	elif event.num == 7:
+		auto_pause_min_words = auto_pause_min_words + 1
+		os.system('echo \'{ "command": ["show-text", "auto_pause_min_words: ' + str(auto_pause_min_words) + '"] }\' | socat - "' + mpv_socket + '" > /dev/null')
 
-	# for live resize/reposition
-	beysc()
-	render_subtitles()
 
 def wheel_click(event):
 	global auto_pause
