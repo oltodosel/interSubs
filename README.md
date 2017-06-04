@@ -9,6 +9,8 @@ Uses http://pons.com/ for translation and http://linguee.com/ redirecting to bro
 Linguee, unlike Pons, bans excessive usage by IP, so don't overuse it or write scrapping functions for it.
 Pons has an API, but it's limited to 1k requests per month, so scraping it is.
 
+Doesn't work with DVD (picture based) subtitles, only the text-based ones.
+
 Can extend time of subs showing; for slow readers
     
     00:02:23,046 --> 00:02:25,990
