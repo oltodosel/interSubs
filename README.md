@@ -1,7 +1,7 @@
 interSubs
 =========
 
-v. 1.7
+v. 1.8
 
 Interactive subtitles for `mpv`, that was made to help study languages. Easily tweaked and customizable.
 
@@ -10,6 +10,8 @@ Linguee, unlike Pons, bans excessive usage by IP, so don't overuse it or write s
 Pons has an API, but it's limited to 1k requests per month, so scraping it is.
 
 Doesn't work with DVD (picture based) subtitles, only the text-based ones.
+
+Can colorize nouns by gender; German only with given dictionary.
 
 Can extend time of subs showing; for slow readers
     
