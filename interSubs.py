@@ -1,6 +1,6 @@
 #! /usr/bin/env python3
 
-# v. 1.7
+# v. 1.8
 # Interactive subtitles for `mpv` for language learners.
 
 import os, subprocess, sys
@@ -51,6 +51,15 @@ def render_subtitles():
 
 	for i1, line in enumerate(subs2.split('\n')):
 		for i2, word in enumerate(line.split(' ')):
+			fgc = font_color1
+			if colorize_nouns and word.istitle() and stripsd3(word) in de_dict:
+				if de_dict[stripsd3(word)] == 'Masc':
+					fgc = font_color8
+				elif de_dict[stripsd3(word)] == 'Fem':
+					fgc = font_color9
+				elif de_dict[stripsd3(word)] == 'Neut':
+					fgc = font_color10
+
 			if i2 != len(line.split(' ')) - 1:
 				word = word + ' '
 
@@ -59,7 +68,7 @@ def render_subtitles():
 			else:
 				bb = Button(frame2)
 
-			bb.configure(text = word, font = font1, borderwidth = 0, padx = 0, pady = 0, relief = FLAT, background = bg_color1 ,foreground = font_color1, highlightthickness = 0)
+			bb.configure(text = word, font = font1, borderwidth = 0, padx = 0, pady = 0, relief = FLAT, background = bg_color1, foreground = fgc, highlightthickness = 0)
 			word = stripsd(word)
 			bb.pack(side = LEFT)
 			bb.bind("<Enter>", lambda event, arg = word: render_popup(event, arg))
@@ -293,16 +302,6 @@ def wheel_ev(event, word = ''):
 		auto_pause_min_words = auto_pause_min_words + 1
 		os.system('echo \'{ "command": ["show-text", "auto_pause_min_words: ' + str(auto_pause_min_words) + '"] }\' | socat - "' + mpv_socket + '" > /dev/null')
 
-
-def wheel_click(event):
-	global auto_pause
-	if auto_pause == 2:
-		auto_pause = 0
-	else:
-		auto_pause += 1
-
-	os.system('echo \'{ "command": ["show-text", "auto_pause: ' + str(auto_pause) + '"] }\' | socat - "' + mpv_socket + '" > /dev/null')
-
 def listen(word):
 	if lang_from + lang_to in pons_combos:
 		url = 'http://en.pons.com/translate?q=%s&l=%s%s&in=%s' % (quote(word), lang_from, lang_to, lang_from)
@@ -318,7 +317,7 @@ def listen(word):
 			mp3 = 'http://sounds.pons.com/audio_tts/%s/%s' % (l, x[0][0])
 			break
 
-	os.system('(cd /tmp; wget ' + mp3 + '; mpv --loop=1 --volume=40 --force-window=no ' + mp3.split('/')[-1] + '; rm ' + mp3.split('/')[-1] + ') &')
+	os.system('(cd /tmp; wget ' + mp3 + '; mpv --load-scripts=no --loop=1 --volume=40 --force-window=no ' + mp3.split('/')[-1] + '; rm ' + mp3.split('/')[-1] + ') &')
 
 def mpv_pause(e = None):
 	if pause_during_translation:
@@ -345,7 +344,10 @@ def stripsd(word):
 	return ''.join(e for e in word.strip().lower() if e.isalnum() and not e.isdigit())
 
 def stripsd2(phrase):
-	return ''.join(e for e in phrase.strip().lower() if e == ' ' or (e.isalnum() and not e.isdigit()))
+	return ''.join(e for e in phrase.strip().lower() if e == ' ' or (e.isalnum() and not e.isdigit())).strip()
+
+def stripsd3(word):
+	return ''.join(e for e in word.strip() if e.isalnum() and not e.isdigit())
 
 #########################################
 
@@ -353,6 +355,9 @@ print('[py part] Starting interSubs ...')
 pth = os.path.expanduser('~/.config/mpv/scripts/')
 os.chdir(pth)
 exec(open('interSubs.conf.py').read())
+
+if colorize_nouns:
+	de_dict = { x.split('\t')[0] : x.split('\t')[2] for x in open(colorization_dict).readlines() }
 
 mpv_socket = sys.argv[1]
 sub_file = sys.argv[2]
@@ -383,7 +388,7 @@ subs = ''
 scroll = {}
 was_hidden = 0
 inc = 0
-c3 = 0
+auto_pause_2_ind = 0
 while 1:
 	sleep(update_time)
 	window.update()
@@ -417,14 +422,14 @@ while 1:
 
 	while tmp_file_subs != subs:
 		if auto_pause == 2:
-			if not c3 and len(re.sub(' +', ' ', stripsd2(subs.replace('\n', ' '))).split(' ')) > auto_pause_min_words - 1 and not mpv_pause_status():
+			if not auto_pause_2_ind and len(re.sub(' +', ' ', stripsd2(subs.replace('\n', ' '))).split(' ')) > auto_pause_min_words - 1 and not mpv_pause_status():
 				mpv_pause()
-				c3 = 1
+				auto_pause_2_ind = 1
 
-			if c3 and mpv_pause_status():
+			if auto_pause_2_ind and mpv_pause_status():
 				break
 
-			c3 = 0
+			auto_pause_2_ind = 0
 
 		subs = tmp_file_subs
 		beysc()

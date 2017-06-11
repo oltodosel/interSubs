@@ -1,7 +1,8 @@
--- v. 1.7
+-- v. 1.8
 -- Interactive subtitles for `mpv` for language learners.
 
 -- default keybinding: F5
+-- if interSubs start automatically - mpv won't show notification
 -- dirs in which interSubs will start automatically
 autostart_in = {'/med/p/TV', '/med/German', '/med/video/youtube', '/med/2see', '/med/p/Movies'}
 -- for Mac change python3 to python or pythonw
@@ -20,12 +21,10 @@ function s1()
 	mp.register_event("end-file", s_rm)
 	mp.register_event("quit", s_rm)
 
-	--os.execute('notify-send -i none -t 999 "Starting interSubs ..."')
-	--mp.command('show-text "Starting interSubs ..."')
 	mp.msg.warn('Starting interSubs ...')
 
 	running = true
-	rnbr = math.random(111111,999999)
+	rnbr = math.random(11111,99999)
 
 	-- setting up socket to control mpv
 	mpv_socket_2 = mpv_socket .. '_' .. rnbr
@@ -61,8 +60,6 @@ function s_rm()
 	mp.set_property_number("sub-font-size", sfs1)
 	mp.set_property_number("sub-scale", sfs2)
 
-	--os.execute('notify-send -i none -t 999 "Quitting interSubs ..."')
-	--mp.command('show-text "Quitting interSubs ..."')
 	mp.msg.warn('Quitting interSubs ...')
 
 	os.execute('pkill -f "' .. mpv_socket_2 .. '"')
@@ -78,5 +75,17 @@ function started()
 	end
 end
 
-mp.add_forced_key_binding("f5", "start-stop-interSubs", s1)
+function s1_1()
+	if running == true then
+		s_rm()
+
+		mp.command('show-text "Quitting interSubs ..."')
+		--os.execute('notify-send -i none -t 999 "Quitting interSubs ..."')
+	else
+		mp.command('show-text "Starting interSubs ..."')
+		--os.execute('notify-send -i none -t 999 "Starting interSubs ..."')
+	end
+end
+
+mp.add_forced_key_binding("f5", "start-stop-interSubs", s1_1)
 mp.register_event("start-file", started)

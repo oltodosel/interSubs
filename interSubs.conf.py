@@ -1,4 +1,4 @@
-# v. 1.7
+# v. 1.8
 # Interactive subtitles for `mpv` for language learners.
 
 # BEWARE!
@@ -36,6 +36,11 @@ font_color4 = '#CA8200'				# [popup] morphology
 font_color5 = '#1E90FF'				# [popup] nouns, masculine
 font_color6 = '#BD3030'				# [popup] nouns, feminine
 font_color7 = '#6DB56D'				# [popup] nouns, neuter
+
+font_color8 = '#5EB0FF'				# [colorize_nouns] nouns, masculine
+font_color9 = '#FFA6B5'				# [colorize_nouns] nouns, feminine
+font_color10 = '#90EE90'			# [colorize_nouns] nouns, neuter
+
 bg_color1 = '#000000'				# subtitles
 bg_color2 = '#2C2C2C'				# translation popup
 
@@ -45,7 +50,7 @@ popup_ext_n_int_padding = 6
 translation_function_name = 'pons'	# or other function's name you might write that will return ([[word, translation]..], [morphology = '', gender = ''])
 
 # for going through lines step by step
-auto_pause_min_words = 11			# skip pausing when subs are less then X words
+auto_pause_min_words = 10			# skip pausing when subs are less then X words
 auto_pause = 0						# 0 - don't pause
 									# 1 - pause after subs change
 									# 2 - pause before subs change
@@ -53,3 +58,9 @@ auto_pause = 0						# 0 - don't pause
 
 split_long_lines = 1				# when subtitle consists of only one overly long line - splitting into two
 split_long_lines_words_min = 7		# split when there are more than N words in line
+
+colorize_nouns = 0 					# colorize nouns by gender; German only with given dictionary
+
+# it should have pattern: Word\t\tGender\t...
+# exact genders are Masc/Fem/Neut
+colorization_dict = 'interSubs.delexicon.txt'
