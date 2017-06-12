@@ -78,10 +78,10 @@ end
 function s1_1()
 	if running == true then
 		s_rm()
-
 		mp.command('show-text "Quitting interSubs ..."')
 		--os.execute('notify-send -i none -t 999 "Quitting interSubs ..."')
 	else
+		s1()
 		mp.command('show-text "Starting interSubs ..."')
 		--os.execute('notify-send -i none -t 999 "Starting interSubs ..."')
 	end
