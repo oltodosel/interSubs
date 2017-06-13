@@ -1,6 +1,6 @@
 #! /usr/bin/env python3
 
-# v. 1.8
+# v. 1.9
 # Interactive subtitles for `mpv` for language learners.
 
 import os, subprocess, sys
@@ -33,10 +33,11 @@ def render_subtitles():
 	frame = Frame(window)
 	frame.configure(background = bg_color1, padx = 4, pady = 0)
 	frame.pack()
-
-	frame.bind("<Enter>", mpv_pause)		# binding frame to cover whitespaces
-	frame.bind("<Leave>", mpv_resume)
 	frame.bind("<Button>", wheel_ev)
+
+	if pause_during_translation:
+		frame.bind("<Enter>", mpv_pause)
+		frame.bind("<Leave>", mpv_resume)
 
 	# putting first line without its own frame won't center it when second line is longer
 	frame1 = Frame(frame)
@@ -260,7 +261,7 @@ def wheel_ev(event, word = ''):
 		else:
 			auto_pause += 1
 
-		os.system('echo \'{ "command": ["show-text", "auto_pause: ' + str(auto_pause) + '"] }\' | socat - "' + mpv_socket + '" > /dev/null')
+		mpv_message('auto_pause: ' + str(auto_pause))
 	elif event.num == 3:
 		listen(word)
 	elif event.num == 4:
@@ -273,10 +274,12 @@ def wheel_ev(event, word = ''):
 				render_popup(event, word)
 		elif event.state == 1:
 			font1 = (font1[0], font1[1] + 1)
+			mpv_message('font1: ' + str(font1))
 			beysc()
 			render_subtitles()
 		elif event.state == 4:
 			subs_bottom_padding += 5
+			mpv_message('subs_bottom_padding: ' + str(subs_bottom_padding))
 			beysc()
 			render_subtitles()
 	elif event.num == 5:
@@ -289,18 +292,20 @@ def wheel_ev(event, word = ''):
 				render_popup(event, word)
 		elif event.state == 1:
 			font1 = (font1[0], font1[1] - 1)
+			mpv_message('font1: ' + str(font1))
 			beysc()
 			render_subtitles()
 		elif event.state == 4:
 			subs_bottom_padding -= 5
+			mpv_message('subs_bottom_padding: ' + str(subs_bottom_padding))
 			beysc()
 			render_subtitles()
 	elif event.num == 6:
 		auto_pause_min_words = auto_pause_min_words - 1
-		os.system('echo \'{ "command": ["show-text", "auto_pause_min_words: ' + str(auto_pause_min_words) + '"] }\' | socat - "' + mpv_socket + '" > /dev/null')
+		mpv_message('auto_pause_min_words: ' + str(auto_pause_min_words))
 	elif event.num == 7:
 		auto_pause_min_words = auto_pause_min_words + 1
-		os.system('echo \'{ "command": ["show-text", "auto_pause_min_words: ' + str(auto_pause_min_words) + '"] }\' | socat - "' + mpv_socket + '" > /dev/null')
+		mpv_message('auto_pause_min_words: ' + str(auto_pause_min_words))
 
 def listen(word):
 	if lang_from + lang_to in pons_combos:
@@ -320,12 +325,10 @@ def listen(word):
 	os.system('(cd /tmp; wget ' + mp3 + '; mpv --load-scripts=no --loop=1 --volume=40 --force-window=no ' + mp3.split('/')[-1] + '; rm ' + mp3.split('/')[-1] + ') &')
 
 def mpv_pause(e = None):
-	if pause_during_translation:
-		os.system('echo \'{ "command": ["set_property", "pause", true] }\' | socat - "' + mpv_socket + '" > /dev/null')
+	os.system('echo \'{ "command": ["set_property", "pause", true] }\' | socat - "' + mpv_socket + '" > /dev/null')
 
 def mpv_resume(e = None):
-	if pause_during_translation:
-		os.system('echo \'{ "command": ["set_property", "pause", false] }\' | socat - "' + mpv_socket + '" > /dev/null')
+	os.system('echo \'{ "command": ["set_property", "pause", false] }\' | socat - "' + mpv_socket + '" > /dev/null')
 
 def mpv_pause_status():
 	stdoutdata = subprocess.getoutput('echo \'{ "command": ["get_property", "pause"] }\' | socat - "' + mpv_socket + '"')
@@ -334,6 +337,9 @@ def mpv_pause_status():
 def mpv_fullscreen_status():
 	stdoutdata = subprocess.getoutput('echo \'{ "command": ["get_property", "fullscreen"] }\' | socat - "' + mpv_socket + '"')
 	return loads(stdoutdata)['data']
+
+def mpv_message(message, timeout = 3000):
+	os.system('echo \'{ "command": ["show-text", "' + message + '", "' + str(timeout) + '"] }\' | socat - "' + mpv_socket + '" > /dev/null')
 
 # render beyond the screen
 def beysc():
@@ -394,16 +400,17 @@ while 1:
 	window.update()
 
 	# hide subs when mpv isn't in focus or in fullscreen
-	if inc * update_time > focus_checking_time:
-		try:
-			if 'mpv' not in subprocess.check_output(['xdotool', 'getwindowfocus', 'getwindowname']).decode("utf8", "ignore") or (hide_when_not_fullscreen and not mpv_fullscreen_status()):
-				was_hidden = 1
+	if inc * update_time > focus_checking_time - 0.0001:
+		while 'mpv' not in subprocess.getoutput('xdotool getwindowfocus getwindowname') or (hide_when_not_fullscreen and not mpv_fullscreen_status()):
+			if not was_hidden:
+				try:
+					popup.destroy()
+				except:
+					pass
 				beysc()
-				frame.destroy()
-				popup.destroy()
-				continue
-		except:
-			continue
+				was_hidden = 1
+			else:
+				sleep(focus_checking_time)
 		inc = 0
 	inc += 1
 

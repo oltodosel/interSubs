@@ -1,4 +1,4 @@
--- v. 1.8
+-- v. 1.9
 -- Interactive subtitles for `mpv` for language learners.
 
 -- default keybinding: F5
@@ -62,9 +62,9 @@ function s_rm()
 
 	mp.msg.warn('Quitting interSubs ...')
 
-	os.execute('pkill -f "' .. mpv_socket_2 .. '"')
-	os.remove(sub_file_2)
-	os.remove(mpv_socket_2)
+	os.execute('pkill -f "' .. mpv_socket_2 .. '";')
+	os.execute('(sleep 3 && rm "' .. mpv_socket_2 .. '") &')
+	os.execute('(sleep 3 && rm "' .. sub_file_2 .. '";) &')
 end
 
 function started()
