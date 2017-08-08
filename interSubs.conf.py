@@ -1,4 +1,4 @@
-# v. 1.9
+# v. 1.10
 # Interactive subtitles for `mpv` for language learners.
 
 # BEWARE!
@@ -8,6 +8,8 @@
 
 #########################################
 
+# make sure selected translation function supports your language and so that codes of your languages are correct
+# for instance Pons doesn't support Hebrew, Google and Reverso do, but their codes are different: 'iw' and 'he' respectively
 lang_from = 'de'					# translate from language
 lang_to = 'en'						# translate to language
 
@@ -26,7 +28,7 @@ focus_checking_time = .3			# interval in seconds between checking if mpv is in f
 
 external_dictionary_cmd_on_click = 'chromium "http://www.linguee.com/german-english/search?source=german&query=${word}"'	# firefox "https://en.wiktionary.org/wiki/${word}"
 
-font1 = ("Trebuchet MS", 39)		# subtitles (font, size)
+font1 = ("Trebuchet MS", 40)		# subtitles (font, size)
 font2 = ("Trebuchet MS", 30)		# [popup] original language & translation
 font3 = ("Trebuchet MS", 26)		# [popup] morphology
 font_color1 = '#BAC4D6'				# subtitles
@@ -47,7 +49,8 @@ bg_color2 = '#2C2C2C'				# translation popup
 subs_bottom_padding = 8
 popup_ext_n_int_padding = 6
 
-translation_function_name = 'pons'	# or other function's name you might write that will return ([[word, translation]..], [morphology = '', gender = ''])
+translation_function_name = 'reverso'	# or other function's name you might write that will return ([[word, translation]..], [morphology = '', gender = ''])
+									# available: pons, reverso, mtranslate_google (one word translation - for uncommon languages)
 
 # for going through lines step by step
 auto_pause_min_words = 10			# skip pausing when subs are less then X words
@@ -64,3 +67,5 @@ colorize_nouns = 0 					# colorize nouns by gender; German only with given dicti
 # it should have pattern: Word\t\tGender\t...
 # exact genders are Masc/Fem/Neut
 colorization_dict = 'interSubs.delexicon.txt'
+
+listen_via = 'gtts'					# gtts|pons # gtts is google-text-to-speech

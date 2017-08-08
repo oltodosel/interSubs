@@ -1,10 +1,10 @@
--- v. 1.9
+-- v. 1.10
 -- Interactive subtitles for `mpv` for language learners.
 
 -- default keybinding: F5
 -- if interSubs start automatically - mpv won't show notification
 -- dirs in which interSubs will start automatically
-autostart_in = {'/med/p/TV', '/med/German', '/med/video/youtube', '/med/2see', '/med/p/Movies'}
+autostart_in = {'/med/p/TV', '/med/German', '/med/2see', '/med/p/Movies'}
 -- for Mac change python3 to python or pythonw
 start_command = 'python3 "%s" "%s" "%s"'
 
