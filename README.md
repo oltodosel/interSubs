@@ -1,11 +1,11 @@
 interSubs
 =========
 
-v. 1.9
+v. 1.10
 
 Interactive subtitles for `mpv`, that was made to help study languages. Easily tweaked and customizable.
 
-- Uses http://pons.com/ for translation and http://linguee.com/ redirecting to browser by click.
+ - Uses http://pons.com/ or http://reverso.net/ for translation and http://linguee.com/ redirecting to browser by click.
 - Linguee, unlike Pons, bans excessive usage by IP, so don't overuse it or write scrapping functions for it.
 - Pons has an API, but it's limited to 1k requests per month, so scraping it is.
 -
@@ -32,6 +32,7 @@ Requirements
    - mpv 0.25 (I don't know if it will work with mpv front-ends.)
    - Python 3
    - numpy (pip)
+   - beautifulsoup4 (pip)
    - Tcl/Tk 8.6.6
    - Lua
    - pkill
