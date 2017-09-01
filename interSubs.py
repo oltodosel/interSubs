@@ -1,27 +1,24 @@
 #! /usr/bin/env python3
 
-# v. 1.10
+# v. 1.11
 # Interactive subtitles for `mpv` for language learners.
 
 import os, subprocess, sys
+import random, re, time
 import requests
 from tkinter import *
-from time import sleep
-from urllib.parse import quote
-from random import shuffle
-import subprocess
-from json import loads
-import numpy
 
-import requests, warnings
+from urllib.parse import quote
+from json import loads
+
+import warnings
 from six.moves import urllib
-from requests.packages.urllib3.exceptions import InsecureRequestWarning
 
 import calendar
 import math
-import time
-import re
+import base64
 
+import numpy
 from bs4 import BeautifulSoup
 
 def render_subtitles():
@@ -52,41 +49,81 @@ def render_subtitles():
 
 	# putting first line without its own frame won't center it when second line is longer
 	frame1 = Frame(frame)
+	frame1.configure(background = bg_color1)
 	frame1.pack()
 	frame2 = Frame(frame)
+	frame2.configure(background = bg_color1)
 	frame2.pack()
 
+	# if subtitle consists of one overly long line - split in two
 	if split_long_lines and len(subs.split('\n')) == 1 and len(subs.split(' ')) > split_long_lines_words_min - 1:
 		subs2 = ' '.join(numpy.array_split(subs.split(' '), 2)[0]) + '\n' + ' '.join(numpy.array_split(subs.split(' '), 2)[1])
 	else:
 		subs2 = subs
 
 	for i1, line in enumerate(subs2.split('\n')):
-		for i2, word in enumerate(line.split(' ')):
-			fgc = font_color1
-			if colorize_nouns and word.istitle() and stripsd3(word) in de_dict:
-				if de_dict[stripsd3(word)] == 'Masc':
-					fgc = font_color8
-				elif de_dict[stripsd3(word)] == 'Fem':
-					fgc = font_color9
-				elif de_dict[stripsd3(word)] == 'Neut':
-					fgc = font_color10
+		line = line.strip()
+		line2 = ''
 
-			if i2 != len(line.split(' ')) - 1:
-				word = word + ' '
+		if R2L_from:
+			# since tk doesn't support right-to-left text
+			# might botch some text
+			try:
+				line2 = re.findall('(?!%)\W+$',line)[0]
+			except:
+				pass
 
-			if not i1:
-				bb = Button(frame1)
+			line2 += re.sub('^\W+|(?!%)\W+$','',line)
+
+			try:
+				line2 += re.findall('^\W+',line)[0]
+			except:
+				pass
+
+			line2 = line2[::-1]
+			# reversing back numbers
+			line2 = re.sub('[0-9%-]{2,}', lambda x: x.group(0)[::-1], line2)
+		else:
+			line2 = line
+
+		line2 += '\00'
+		word = ''
+		for smbl in line2:
+			if smbl.isalpha():
+				word += smbl
 			else:
-				bb = Button(frame2)
+				if len(word):
+					if not i1:
+						bb = Button(frame1)
+					else:
+						bb = Button(frame2)
 
-			bb.configure(text = word, font = font1, borderwidth = 0, padx = 0, pady = 0, relief = FLAT, background = bg_color1, foreground = fgc, highlightthickness = 0)
-			word = stripsd(word)
+					fgc = font_color1
+					if colorize_nouns and word.istitle() and stripsd3(word) in de_dict:
+						if de_dict[stripsd3(word)] == 'Masc':
+							fgc = font_color8
+						elif de_dict[stripsd3(word)] == 'Fem':
+							fgc = font_color9
+						elif de_dict[stripsd3(word)] == 'Neut':
+							fgc = font_color10
 
-			bb.pack(side = LEFT)
-			bb.bind("<Enter>", lambda event, arg = word: render_popup(event, arg))
-			bb.bind("<Leave>", lambda event: popup.destroy())
-			bb.bind("<Button>", lambda event, arg = word: wheel_ev(event, arg))
+					bb.configure(text = word, font = font1, borderwidth = 0, padx = 0, pady = 0, relief = FLAT, background = bg_color1, foreground = fgc, highlightthickness = 0)
+
+					if R2L_from:
+						word = word[::-1]
+
+					bb.pack(side = LEFT)
+					bb.bind("<Enter>", lambda event, arg = word: render_popup(event, arg))
+					bb.bind("<Leave>", lambda event: popup.destroy())
+					bb.bind("<Button>", lambda event, arg = word: wheel_ev(event, arg))
+
+					word = ''
+
+				if smbl != '\00':
+					if not i1:
+						Label(frame1, text = smbl, font = font1, borderwidth = 0, padx = 0, pady = 0, relief = FLAT, background = bg_color1, foreground = font_color1, highlightthickness = 0).pack(side = LEFT)
+					else:
+						Label(frame2, text = smbl, font = font1, borderwidth = 0, padx = 0, pady = 0, relief = FLAT, background = bg_color1, foreground = font_color1, highlightthickness = 0).pack(side = LEFT)
 
 	window.update_idletasks()
 
@@ -118,7 +155,7 @@ def render_popup(event, word):
 
 	if randomize_translations:
 		tmp_pairs = pairs[1:]
-		shuffle(tmp_pairs)
+		random.shuffle(tmp_pairs)
 		pairs = [pairs[0]] + tmp_pairs
 	elif word in scroll:
 		if len(pairs[scroll[word]:]) > number_of_translations:
@@ -141,12 +178,20 @@ def render_popup(event, word):
 		if pair[0] == '-':
 			pair[0] = ''
 		if pair[1] == '-':
-
 			pair[1] = ''
+
+		anchor1 = "w"
+		anchor2 = "w"
+		if R2L_from:
+			pair[0] = pair[0][::-1]
+			anchor1 = "e"
+		if R2L_to:
+			pair[1] = pair[1][::-1]
+			anchor2 = "e"
 
 		# to emphasize the exact form of the word
 		psdo_label = Frame(popup)
-		psdo_label.pack(side = "top", anchor = "w")
+		psdo_label.pack(side = "top", anchor = anchor1)
 		psdo_label.configure(borderwidth = 0, padx = popup_ext_n_int_padding, pady = 0, background = bg_color2)
 
 		# to ignore case on input and match it on output
@@ -159,7 +204,7 @@ def render_popup(event, word):
 			if i + 1 < len(chnks):
 				Label(psdo_label, text = exct_words[i], font = font2 + ('underline',), borderwidth = 0, padx = 0, pady = 0, background = bg_color2, foreground = font_color2, highlightthickness = 0, wraplength = wrplgth, justify = "left").pack(side = "left", anchor = "w")
 
-		Label(popup, text = pair[1], font = font2, borderwidth = 0, padx = popup_ext_n_int_padding, pady = 0, background = bg_color2, foreground = font_color3, highlightthickness = 0, wraplength = wrplgth, justify = "left").pack(side = "top", anchor = "w")
+		Label(popup, text = pair[1], font = font2, borderwidth = 0, padx = popup_ext_n_int_padding, pady = 0, background = bg_color2, foreground = font_color3, highlightthickness = 0, wraplength = wrplgth, justify = "left").pack(side = "top", anchor = anchor2)
 
 		# couldn't control padding of one side, thus:
 		Label(popup, pady = 0, background = bg_color2).pack(side = "top")
@@ -216,35 +261,28 @@ def pons(word):
 			error
 	except:
 		p = requests.get(url, headers={'User-Agent': 'Mozilla/5.0'}).text
-		p = p.replace('&#39;',"'")
-		p = p.replace('<acronym title="informal">fam</acronym>', ' ')
-		p = re.sub('<span class="flag .*?</a>', ' ', p)
 
-		x = re.findall('<dt>(.*?)</dt>.*?<dd>(.*?)</dd>', p, re.DOTALL)
+		soup = BeautifulSoup(p, "lxml")
+		trs = soup.find_all('dl')
 
-		for c in x:
-			f1 = c[0].replace('\n', ' ')
-			f1 = re.sub('<acronym(.*?)>(.*?)</acronym>', '\g<2>', f1)
-			f1 = re.sub('<(.*?)>', '', f1)
-			f1 = re.sub(' +', ' ', f1)
-			f1 = f1.strip()
-			###
-			f2 = c[1]
-			f2 = re.sub('<acronym(.*?)>(.*?)</acronym>', '\g<2>', f2)
-			f2 = re.sub('<(.*?)>', '', f2)
-			f2 = f2.strip()
-			f2 = f2.split('\n')[0]
-			f2 = re.sub(' +', ' ', f2)
-			f2 = f2.strip()
+		for tr in trs[1:]:
+			tr1 = tr.find('dt').find('div', class_="source").get_text()
+			tr1 = re.sub('\n|\r|\t', ' ', tr1)
+			tr1 = re.sub(' +', ' ', tr1).strip()
 
-			pairs.append([f1, f2])
+			tr2 = tr.find('dd').find('div', class_="target").get_text()
+			tr2 = re.sub('\n|\r|\t', ' ', tr2)
+			tr2 = re.sub(' +', ' ', tr2).strip()
+
+			pairs.append([tr1, tr2])
 
 			if number_of_translations_to_save and len(pairs) > number_of_translations_to_save:
 				break
+
 		try:
-			p = p.replace('<span class="roman">I.</span>',"")
-			y = re.findall('<div class="entry.*?<h2>(.*?)</h2>', p, re.DOTALL)
-			word_descr = re.sub(' +', ' ', re.sub('<(.*?)>|\n|\r|\t| ', ' ', y[0]).replace('&lt;', '<').replace('&gt;', '>')).replace(' · ', '·').replace(' , ', ', ').strip()
+			word_descr = soup.find_all('h2', class_ = '')
+			word_descr = re.sub('\n|\r|\t', ' ', word_descr[0].get_text())
+			word_descr = re.sub(' +', ' ', word_descr).replace('&lt;', '<').replace('&gt;', '>').replace(' · ', '·').replace(' , ', ', ').strip()
 		except:
 			word_descr = ''
 
@@ -426,8 +464,28 @@ def listen(word, type = 'gtts'):
 
 		os.system('(cd /tmp; wget ' + mp3 + '; mpv --load-scripts=no --loop=1 --volume=40 --force-window=no ' + mp3.split('/')[-1] + '; rm ' + mp3.split('/')[-1] + ') &')
 	elif type == 'gtts':
-		gTTS(text = word, lang = 'de', slow = False).save('/tmp/gtts_word.mp3')
+		gTTS(text = word, lang = lang_from, slow = False).save('/tmp/gtts_word.mp3')
 		os.system('(mpv --load-scripts=no --loop=1 --volume=75 --force-window=no ' + '/tmp/gtts_word.mp3' + '; rm ' + '/tmp/gtts_word.mp3' + ') &')
+	elif type == 'forvo':
+		url = 'https://forvo.com/word/%s/%s/' % (lang_from, quote(word))
+
+		try:
+			data = requests.get(url, headers={'User-Agent': 'Mozilla/5.0'}).text
+
+			soup = BeautifulSoup(data, "lxml")
+			trs = soup.find_all('article', class_ = 'pronunciations')[0].find_all('a', class_ = 'play')
+
+			for tr in trs[:2]:
+				tr = tr['onclick']
+				tr = re.findall('Play\((.*?)\)', tr)[0]
+				tr = tr.split(',')[4].replace("'", '')
+				tr = base64.b64decode(tr)
+				tr = tr.decode("utf-8")
+				print(tr)
+
+				os.system('(mpv --load-scripts=no --loop=2 --volume=111 --force-window=no https://audio00.forvo.com/audios/mp3/%s) &' % tr)
+		except:
+			return
 
 # https://github.com/Boudewijn26/gTTS-token
 class Token:
@@ -631,7 +689,7 @@ class gTTS:
 				# Disable requests' ssl verify to accomodate certain proxies and firewalls
 				# Filter out urllib3's insecure warnings. We can live without ssl verify here
 				with warnings.catch_warnings():
-					warnings.filterwarnings("ignore", category=InsecureRequestWarning)
+					warnings.filterwarnings("ignore", category=requests.packages.urllib3.exceptions.InsecureRequestWarning)
 					r = requests.get(self.GOOGLE_TTS_URL,
 									 params=payload,
 									 headers=headers,
@@ -709,9 +767,6 @@ def beysc():
 	window.geometry('+%d+%d' % (ws+999, hs+999))
 	window.update_idletasks()
 
-def stripsd(word):
-	return ''.join(e for e in word.strip().lower() if e.isalnum() and not e.isdigit())
-
 def stripsd2(phrase):
 	return ''.join(e for e in phrase.strip().lower() if e == ' ' or (e.isalnum() and not e.isdigit())).strip()
 
@@ -763,7 +818,7 @@ if __name__ == "__main__":
 	inc = 0
 	auto_pause_2_ind = 0
 	while 1:
-		sleep(update_time)
+		time.sleep(update_time)
 		window.update()
 
 		# hide subs when mpv isn't in focus or in fullscreen
@@ -777,7 +832,7 @@ if __name__ == "__main__":
 					beysc()
 					was_hidden = 1
 				else:
-					sleep(focus_checking_time)
+					time.sleep(focus_checking_time)
 			inc = 0
 		inc += 1
 
@@ -793,6 +848,18 @@ if __name__ == "__main__":
 
 		if extend_subs_duration2max and not len(tmp_file_subs):
 			continue
+
+		# automatically switch into Hebrew language if it's detected
+		if lang_from != 'he' and any((c in set('קראטוןםפשדגכעיחלךףזסבהנמצתץ')) for c in tmp_file_subs):
+			lang_from = 'he'
+			# http://culmus.sourceforge.net/summary.html
+			font1 = (random.choice(['Miriam', 'Yehuda', 'Ellinia', 'Drugulin', 'Caladings', 'David', 'Frank Ruehl', 'Nachlieli', 'Miriam Mono', 'Shofar', 'Hadasim', 'Simple', 'Stam']), 44)
+			R2L_from = 1
+			translation_function_name = 'reverso'
+			listen_via = 'forvo'
+
+			os.system('notify-send -i none -t 1111 "He"')
+			os.system('notify-send -i none -t 1111 "%s"' % str(font1))
 
 		while tmp_file_subs != subs:
 			if auto_pause == 2:

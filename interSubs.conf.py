@@ -1,4 +1,4 @@
-# v. 1.10
+# v. 1.11
 # Interactive subtitles for `mpv` for language learners.
 
 # BEWARE!
@@ -19,6 +19,9 @@ hide_when_not_fullscreen = 1		# True/False # show interSubs only in fullscreen
 
 save_translations = 1				# True/False # saving to ~/.config/mpv/scripts/urls/
 randomize_translations = 0			# True/False # every translation but first will be shuffled # scrolling through transitions would be disabled
+
+R2L_from = 0						# True/False # translated language is written right-to-left, e.g Hebrew/arabic
+R2L_to = 0							# True/False # translation is written right-to-left, e.g Hebrew/arabic
 
 number_of_translations = 4			# number of translations in popup
 number_of_translations_to_save = 0	# number of translations to save in files for each word; 0 - to save all
@@ -49,7 +52,7 @@ bg_color2 = '#2C2C2C'				# translation popup
 subs_bottom_padding = 8
 popup_ext_n_int_padding = 6
 
-translation_function_name = 'reverso'	# or other function's name you might write that will return ([[word, translation]..], [morphology = '', gender = ''])
+translation_function_name = 'pons'	# or other function's name you might write that will return ([[word, translation]..], [morphology = '', gender = ''])
 									# available: pons, reverso, mtranslate_google (one word translation - for uncommon languages)
 
 # for going through lines step by step
@@ -68,4 +71,4 @@ colorize_nouns = 0 					# colorize nouns by gender; German only with given dicti
 # exact genders are Masc/Fem/Neut
 colorization_dict = 'interSubs.delexicon.txt'
 
-listen_via = 'gtts'					# gtts|pons # gtts is google-text-to-speech
+listen_via = 'gtts'					# gtts|pons|forvo # gtts is google-text-to-speech
