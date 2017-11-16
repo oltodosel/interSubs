@@ -13,8 +13,8 @@ Interactive subtitles for `mpv`, that was made to help study languages. Easily t
 - To convert picture based subtitles into *.srt - https://github.com/oltodosel/extract_n_convert_dvd_bd_subtitles
 -
 - Can colorize nouns by gender; German only with given dictionary.
-- Can extend time of subs showing; for slow readers
 - Works with right-to-left writing.
+- Can extend time of subs showing; for slow readers
 
 ```
     00:02:23,046 --> 00:02:25,990
