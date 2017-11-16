@@ -1,4 +1,4 @@
--- v. 1.10
+-- v. 1.11
 -- Interactive subtitles for `mpv` for language learners.
 
 -- default keybinding: F5
@@ -58,7 +58,8 @@ function s_rm()
 	running = false
 
 	mp.set_property_number("sub-font-size", sfs1)
-	mp.set_property_number("sub-scale", sfs2)
+	--mp.set_property_number("sub-scale", sfs2)
+	mp.set_property_number("sub-scale", 1)
 
 	mp.msg.warn('Quitting interSubs ...')
 
