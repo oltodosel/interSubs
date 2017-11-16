@@ -10,6 +10,8 @@ Interactive subtitles for `mpv`, that was made to help study languages. Easily t
 - Pons has an API, but it's limited to 1k requests per month, so scraping it is.
 -
 - Doesn't work with DVD (picture based) subtitles, only the text-based ones.
+- To convert picture based subtitles into *.srt - https://github.com/oltodosel/extract_n_convert_dvd_bd_subtitles
+-
 - Can colorize nouns by gender; German only with given dictionary.
 - Can extend time of subs showing; for slow readers
 - Works with right-to-left writing.
