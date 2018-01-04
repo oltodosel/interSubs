@@ -62,7 +62,7 @@ function s_rm()
 	mp.set_property_number("sub-scale", 1)
 	--mp.set_property_number("sub-scale", sfs2)
 
-	os.execute('pkill -f "' .. mpv_socket_2 .. '" &')
+	os.execute('pkill -f "' .. mpv_socket_2 .. '"')
 	os.execute('(sleep 3 && rm "' .. mpv_socket_2 .. '") &')
 	os.execute('(sleep 3 && rm "' .. sub_file_2 .. '") &')
 end
