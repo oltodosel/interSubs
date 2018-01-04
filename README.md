@@ -1,7 +1,7 @@
 interSubs
 =========
 
-v. 1.11
+v. 1.12
 
 Interactive subtitles for `mpv`, that was made to help study languages. Easily tweaked and customizable.
 
@@ -65,5 +65,4 @@ Usage
 - Wheel+Ctrl - change subtitles' vertical position.
 - Wheel-click - cycle through auto_pause options.
 - Wheel-click-left/right - +/- auto_pause_min_words. (fancy mouses)
-
-By default works only in fullscreen.
+- By default works only in fullscreen.
