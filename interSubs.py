@@ -1,6 +1,6 @@
 #! /usr/bin/env python3
 
-# v. 1.11
+# v. 1.12
 # Interactive subtitles for `mpv` for language learners.
 
 import os, subprocess, sys
@@ -55,11 +55,13 @@ def render_subtitles():
 	frame2.configure(background = bg_color1)
 	frame2.pack()
 
-	# if subtitle consists of one overly long line - split in two
+	# if subtitle consists of one overly long line - split into two
 	if split_long_lines and len(subs.split('\n')) == 1 and len(subs.split(' ')) > split_long_lines_words_min - 1:
 		subs2 = ' '.join(numpy.array_split(subs.split(' '), 2)[0]) + '\n' + ' '.join(numpy.array_split(subs.split(' '), 2)[1])
 	else:
 		subs2 = subs
+
+	subs2 = re.sub(' +', ' ', subs2)
 
 	for i1, line in enumerate(subs2.split('\n')):
 		line = line.strip()
@@ -81,8 +83,8 @@ def render_subtitles():
 				pass
 
 			line2 = line2[::-1]
-			# reversing back numbers
-			line2 = re.sub('[0-9%-]{2,}', lambda x: x.group(0)[::-1], line2)
+			# reversing back l2r chunks
+			line2 = re.sub('[0-9a-zA-Z%\$-]{2,}', lambda x: x.group(0)[::-1], line2)
 		else:
 			line2 = line
 
@@ -752,6 +754,7 @@ def mpv_pause_status():
 		return mpv_pause_status()
 
 def mpv_fullscreen_status():
+	#return 1
 	stdoutdata = subprocess.getoutput('echo \'{ "command": ["get_property", "fullscreen"] }\' | socat - "' + mpv_socket + '"')
 
 	try:

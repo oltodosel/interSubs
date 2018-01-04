@@ -1,10 +1,11 @@
--- v. 1.11
+-- v. 1.12
 -- Interactive subtitles for `mpv` for language learners.
-
+--
 -- default keybinding: F5
 -- if interSubs start automatically - mpv won't show notification
--- dirs in which interSubs will start automatically
-autostart_in = {'/med/p/TV', '/med/German', '/med/2see', '/med/p/Movies'}
+--
+-- dirs in which interSubs will start automatically; part of path/filename will also work; case insensitive; regexp
+autostart_in = {'/med/doc', 'German', ' ger ', '%.ger%.', 'Deutsch', 'Hebrew'}
 -- for Mac change python3 to python or pythonw
 start_command = 'python3 "%s" "%s" "%s"'
 
@@ -18,18 +19,16 @@ function s1()
 		return
 	end
 
-	mp.register_event("end-file", s_rm)
-	mp.register_event("quit", s_rm)
-
-	mp.msg.warn('Starting interSubs ...')
-
 	running = true
-	rnbr = math.random(11111,99999)
+	mp.msg.warn('Starting interSubs ...')
+	mp.register_event("end-file", s_rm)
 
-	-- setting up socket to control mpv
+	rnbr = math.random(11111,99999)
 	mpv_socket_2 = mpv_socket .. '_' .. rnbr
-	mp.set_property("input-ipc-server", mpv_socket_2)
 	sub_file_2 =  sub_file .. '_' .. rnbr
+	
+	-- setting up socket to control mpv
+	mp.set_property("input-ipc-server", mpv_socket_2)
 
 	-- without visible subs won't work
 	sfs1 = mp.get_property_number("sub-font-size")
@@ -56,22 +55,23 @@ end
 
 function s_rm()
 	running = false
-
-	mp.set_property_number("sub-font-size", sfs1)
-	--mp.set_property_number("sub-scale", sfs2)
-	mp.set_property_number("sub-scale", 1)
-
 	mp.msg.warn('Quitting interSubs ...')
+	
+	mp.set_property("input-ipc-server", '')
+	mp.set_property_number("sub-font-size", sfs1)
+	mp.set_property_number("sub-scale", 1)
+	--mp.set_property_number("sub-scale", sfs2)
 
-	os.execute('pkill -f "' .. mpv_socket_2 .. '";')
+	os.execute('pkill -f "' .. mpv_socket_2 .. '" &')
 	os.execute('(sleep 3 && rm "' .. mpv_socket_2 .. '") &')
-	os.execute('(sleep 3 && rm "' .. sub_file_2 .. '";) &')
+	os.execute('(sleep 3 && rm "' .. sub_file_2 .. '") &')
 end
 
 function started()
 	for kk, pp in pairs(autostart_in) do
-		if mp.get_property("path"):find(pp) or mp.get_property("working-directory"):find(pp) then
+		if mp.get_property("path"):lower():find(pp:lower()) or mp.get_property("working-directory"):lower():find(pp:lower()) then
 			s1()
+			break
 		end
 	end
 end
@@ -80,11 +80,9 @@ function s1_1()
 	if running == true then
 		s_rm()
 		mp.command('show-text "Quitting interSubs ..."')
-		--os.execute('notify-send -i none -t 999 "Quitting interSubs ..."')
 	else
 		s1()
 		mp.command('show-text "Starting interSubs ..."')
-		--os.execute('notify-send -i none -t 999 "Starting interSubs ..."')
 	end
 end
 
