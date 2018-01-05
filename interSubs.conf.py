@@ -26,8 +26,8 @@ R2L_to = 0							# True/False # translation is written right-to-left, e.g Hebrew
 number_of_translations = 4			# number of translations in popup
 number_of_translations_to_save = 0	# number of translations to save in files for each word; 0 - to save all
 
-update_time = .02					# interval in seconds between checking for the next subtitle
-focus_checking_time = .05			# interval in seconds between checking if mpv is in focus using `xdotool` or in fullscreen
+update_time = .01					# interval in seconds between checking for the next subtitle #
+focus_checking_time = .3			# interval in seconds between checking if mpv is in focus using `xdotool` and/or in fullscreen
 
 external_dictionary_cmd_on_click = 'chromium "http://www.linguee.com/german-english/search?source=german&query=${word}"'	# firefox "https://en.wiktionary.org/wiki/${word}"
 
