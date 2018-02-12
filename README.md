@@ -65,4 +65,8 @@ Usage
 - Wheel+Ctrl - change subtitles' vertical position.
 - Wheel-click - cycle through auto_pause options.
 - Wheel-click-left/right - +/- auto_pause_min_words. (fancy mouses)
+
+Important
+-----
 - By default works only in fullscreen.
+- May have issues working in a multi-monitor system.
