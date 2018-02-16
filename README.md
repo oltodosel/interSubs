@@ -1,19 +1,19 @@
 interSubs
 =========
 
-v. 1.12
+v. 1.13
 
 Interactive subtitles for `mpv`, that was made to help study languages. Easily tweaked and customizable.
 
- - Uses http://pons.com/, http://reverso.net/ or Google for translation and http://linguee.com/ redirecting to browser by click.
-- Linguee, unlike Pons, bans excessive usage by IP, so don't overuse it or write scrapping functions for it.
-- Pons has an API, but it's limited to 1k requests per month, so scraping it is.
+ - Uses https://dict.cc/, http://pons.com/, http://reverso.net/ or Google for translation and http://linguee.com/ redirecting to browser by click.
+- Linguee, unlike others, bans excessive usage by IP, so don't overuse it or write scrapping functions for it.
 -
 - Doesn't work with DVD (picture based) subtitles, only the text-based ones.
 - To convert picture based subtitles into *.srt - https://github.com/oltodosel/extract_n_convert_dvd_bd_subtitles
 -
 - Can colorize nouns by gender; German only with given dictionary.
 - Works with right-to-left writing.
+- Autodetects Hebrew and switches to r2l.
 - Can extend time of subs showing; for slow readers
 
 ```
