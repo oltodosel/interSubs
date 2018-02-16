@@ -1,4 +1,4 @@
--- v. 1.12
+-- v. 1.13
 -- Interactive subtitles for `mpv` for language learners.
 --
 -- default keybinding: F5
@@ -26,16 +26,14 @@ function s1()
 	rnbr = math.random(11111,99999)
 	mpv_socket_2 = mpv_socket .. '_' .. rnbr
 	sub_file_2 =  sub_file .. '_' .. rnbr
-	
+
 	-- setting up socket to control mpv
 	mp.set_property("input-ipc-server", mpv_socket_2)
-
+	
+	sbv = mp.get_property("sub-visibility")
 	-- without visible subs won't work
-	sfs1 = mp.get_property_number("sub-font-size")
-	sfs2 = mp.get_property_number("sub-scale")
 	mp.set_property("sub-visibility", "yes")
-	mp.set_property_number("sub-font-size", 1)
-	mp.set_property_number("sub-scale", 0.01)
+	mp.set_property_number("sub-scale", 0)
 
 	start_command_2 = start_command:format(pyname:gsub('~', os.getenv('HOME')), mpv_socket_2, sub_file_2)
 	os.execute(start_command_2 .. ' &')
@@ -43,12 +41,10 @@ function s1()
 	mp.observe_property("sub-text", "string", s2)
 end
 
-function s2()
-	st = mp.get_property("sub-text")
-
-	if type(st) == "string" then
+function s2(name, value)
+	if type(value) == "string" then
 		file = io.open(sub_file_2, "w")
-		file:write(st)
+		file:write(value)
 		file:close()
 	end
 end
@@ -56,11 +52,9 @@ end
 function s_rm()
 	running = false
 	mp.msg.warn('Quitting interSubs ...')
-	
-	mp.set_property("input-ipc-server", '')
-	mp.set_property_number("sub-font-size", sfs1)
+
 	mp.set_property_number("sub-scale", 1)
-	--mp.set_property_number("sub-scale", sfs2)
+	mp.set_property("sub-visibility", sbv)
 
 	os.execute('pkill -f "' .. mpv_socket_2 .. '"')
 	os.execute('(sleep 3 && rm "' .. mpv_socket_2 .. '") &')

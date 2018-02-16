@@ -1,6 +1,6 @@
-#! /usr/bin/env python3
+#! /usr/bin/env python
 
-# v. 1.12
+# v. 1.13
 # Interactive subtitles for `mpv` for language learners.
 
 import os, subprocess, sys
@@ -262,19 +262,23 @@ def pons(word):
 		else:
 			error
 	except:
-		p = requests.get(url, headers={'User-Agent': 'Mozilla/5.0'}).text
+		p = requests.get(url, headers={'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.167 Safari/537.36'}).text
 
 		soup = BeautifulSoup(p, "lxml")
 		trs = soup.find_all('dl')
 
-		for tr in trs[1:]:
-			tr1 = tr.find('dt').find('div', class_="source").get_text()
-			tr1 = re.sub('\n|\r|\t', ' ', tr1)
-			tr1 = re.sub(' +', ' ', tr1).strip()
+		#for tr in trs[1:]:
+		for tr in trs:
+			try:
+				tr1 = tr.find('dt').find('div', class_="source").get_text()
+				tr1 = re.sub('\n|\r|\t', ' ', tr1)
+				tr1 = re.sub(' +', ' ', tr1).strip()
 
-			tr2 = tr.find('dd').find('div', class_="target").get_text()
-			tr2 = re.sub('\n|\r|\t', ' ', tr2)
-			tr2 = re.sub(' +', ' ', tr2).strip()
+				tr2 = tr.find('dd').find('div', class_="target").get_text()
+				tr2 = re.sub('\n|\r|\t', ' ', tr2)
+				tr2 = re.sub(' +', ' ', tr2).strip()
+			except:
+				continue
 
 			pairs.append([tr1, tr2])
 
@@ -314,15 +318,7 @@ def mtranslate_google(word):
 	import urllib.parse
 
 	agent = {'User-Agent':
-	"Mozilla/4.0 (\
-	compatible;\
-	MSIE 6.0;\
-	Windows NT 5.1;\
-	SV1;\
-	.NET CLR 1.1.4322;\
-	.NET CLR 2.0.50727;\
-	.NET CLR 3.0.04506.30\
-	)"}
+	"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.167 Safari/537.36"}
 
 	def unescape(text):
 		parser = html.parser.HTMLParser()
@@ -366,7 +362,7 @@ def reverso(word):
 		else:
 			error
 	except:
-		p = requests.get(url, headers={'User-Agent': 'Mozilla/5.0'}).text
+		p = requests.get(url, headers={'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.167 Safari/537.36'}).text
 
 		soup = BeautifulSoup(p, "lxml")
 		trs = soup.find_all(class_ = re.compile('translation.*ltr.*'))
@@ -389,11 +385,100 @@ def reverso(word):
 
 	return pairs, ['', '']
 
+# linguee.com (unfinished; site blocks frequent requests)
+def linguee(word):
+	url = 'https://www.linguee.com/german-english/search?source=german&query=%s' % quote(word)
+	
+	pairs = []
+	
+	try:
+		if save_translations:
+			os.system('notify-send -i none -t 666 "1"')
+			p = open('urls/' + url.replace('/',"-")).read().split('=====/////-----')
+			os.system('notify-send -i none -t 666 "2"')
+			try:
+				word_descr = p[1].strip()
+			except:
+				word_descr = ''
+
+			for pi in p[0].strip().split('\n\n'):
+				pi = pi.split('\n')
+				pairs.append([pi[0], pi[1]])
+			
+			os.system('notify-send -i none -t 666 "3"')
+		else:
+			error
+	except:
+		os.system('notify-send -i none -t 666 "4"')
+		#p = open('/home/lom/d/1.html', encoding="ISO-8859-15").read()
+		p = requests.get(url, headers={'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.167 Safari/537.36'}).text
+
+		
+		soup = BeautifulSoup(p, "lxml")
+		trs = soup.find_all('div', class_="lemma featured")
+	
+		for tr in trs:
+			pairs.append([tr.find_all('a')[0].get_text(), '-'])
+			for tr2 in tr.find_all('a')[1:]:
+				if len(tr2.get_text()):
+					#print(tr2.get_text())
+					pairs.append(['-', tr2.get_text()])
+		word_descr = ''
+		
+		if save_translations:
+			print('\n\n'.join(e[0] + '\n' + e[1] for e in pairs), file=open('urls/' + url.replace('/',"-"), 'a'))
+			print('\n'+'=====/////-----'+'\n', file=open('urls/' + url.replace('/',"-"), 'a'))
+			print(word_descr, file=open('urls/' + url.replace('/',"-"), 'a'))
+
+	return pairs, ['', '']
+
+# dict.cc
+def dict_cc(word):
+	url = 'https://%s-%s.dict.cc/?s=%s' % (lang_from, lang_to, quote(word))
+	
+	pairs = []
+	try:
+		if save_translations:
+			p = open('urls/' + url.replace('/',"-")).read().split('=====/////-----')
+			try:
+				word_descr = p[1].strip()
+			except:
+				word_descr = ''
+
+			for pi in p[0].strip().split('\n\n'):
+				pi = pi.split('\n')
+				pairs.append([pi[0], pi[1]])
+		else:
+			error
+	except:
+		p = requests.get(url, headers={'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.167 Safari/537.36'}).text
+		
+		p = re.sub('<div style="float:right;color:#999">\d*</div>', '', p)
+		p = re.sub('<span style="color:#666;font-size:10px;padding:0 2px;position:relative;top:-3px">\d*</span>', '', p)
+		
+		soup = BeautifulSoup(p, "lxml")
+		trs = soup.find_all('tr', id = re.compile('tr\d*'))
+		
+		for tr in trs:
+			tr2 = tr.find_all('td', class_ = 'td7nl')
+			pairs.append([tr2[1].get_text(), tr2[0].get_text()])
+			
+			if number_of_translations_to_save and len(pairs) > number_of_translations_to_save:
+				break
+			
+		word_descr = ''
+		
+		if save_translations:
+			print('\n\n'.join(e[0] + '\n' + e[1] for e in pairs), file=open('urls/' + url.replace('/',"-"), 'a'))
+			print('\n'+'=====/////-----'+'\n', file=open('urls/' + url.replace('/',"-"), 'a'))
+			print(word_descr, file=open('urls/' + url.replace('/',"-"), 'a'))
+
+	return pairs, ['', '']
+
 def wheel_ev(event, word = ''):
 	global subs_bottom_padding, font1, scroll, auto_pause, auto_pause_min_words
-
+	
 	# event.state: Ctrl == 4, Shift == 1, None == 0
-
 	if event.num == 1:
 		os.system(external_dictionary_cmd_on_click.replace('${word}', word))
 	elif event.num == 2:
@@ -401,7 +486,6 @@ def wheel_ev(event, word = ''):
 			auto_pause = 0
 		else:
 			auto_pause += 1
-
 		mpv_message('auto_pause: ' + str(auto_pause))
 	elif event.num == 3:
 		listen(word, listen_via)
@@ -455,7 +539,7 @@ def listen(word, type = 'gtts'):
 		else:
 			url = 'http://en.pons.com/translate?q=%s&l=%s%s&in=%s' % (quote(word), lang_to, lang_from, lang_from)
 
-		p = requests.get(url, headers={'User-Agent': 'Mozilla/5.0'}).text
+		p = requests.get(url, headers={'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.167 Safari/537.36'}).text
 		x = re.findall('<dl id="([a-zA-Z0-9]*?)" class="dl-horizontal kne(.*?)</dl>', p, re.DOTALL)
 		x2 = re.findall('class="audio tts trackable trk-audio" data-pons-lang="(.*?)"', x[0][1])
 
@@ -472,7 +556,7 @@ def listen(word, type = 'gtts'):
 		url = 'https://forvo.com/word/%s/%s/' % (lang_from, quote(word))
 
 		try:
-			data = requests.get(url, headers={'User-Agent': 'Mozilla/5.0'}).text
+			data = requests.get(url, headers={'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.167 Safari/537.36'}).text
 
 			soup = BeautifulSoup(data, "lxml")
 			trs = soup.find_all('article', class_ = 'pronunciations')[0].find_all('a', class_ = 'play')
@@ -684,7 +768,7 @@ class gTTS:
 						'tk' : self.token.calculate_token(part)}
 			headers = {
 				"Referer" : "http://translate.google.com/",
-				"User-Agent": "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/47.0.2526.106 Safari/537.36"
+				"User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.167 Safari/537.36"
 			}
 			if self.debug: print(payload)
 			try:
@@ -754,7 +838,7 @@ def mpv_pause_status():
 		return mpv_pause_status()
 
 def mpv_fullscreen_status():
-	#return 1
+	# return 1
 	stdoutdata = subprocess.getoutput('echo \'{ "command": ["get_property", "fullscreen"] }\' | socat - "' + mpv_socket + '"')
 
 	try:
@@ -791,6 +875,9 @@ if save_translations:
 		os.mkdir('urls')
 	except:
 		pass
+
+#exit(pons('verdient'));
+#exit(dict_cc('er'));
 
 if __name__ == "__main__":
 	print('[py part] Starting interSubs ...')
