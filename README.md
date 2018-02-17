@@ -1,11 +1,14 @@
 interSubs
 =========
 
-v. 1.13
+v. 1.14
+
+1.13 > 1.14 - Added simultaneous use of multiple dictionaries. When using more than one - scrolling is infinite.
 
 Interactive subtitles for `mpv`, that was made to help study languages. Easily tweaked and customizable.
 
  - Uses https://dict.cc/, http://pons.com/, http://reverso.net/ or Google for translation and http://linguee.com/ redirecting to browser by click.
+ - Can use multiple dictionaries simultaneously. 
 - Linguee, unlike others, bans excessive usage by IP, so don't overuse it or write scrapping functions for it.
 -
 - Doesn't work with DVD (picture based) subtitles, only the text-based ones.
