@@ -1,6 +1,6 @@
 #! /usr/bin/env python
 
-# v. 1.13
+# v. 1.14
 # Interactive subtitles for `mpv` for language learners.
 
 import os, subprocess, sys
@@ -35,7 +35,7 @@ def render_subtitles():
 
 	if not len(subs):
 		return
-
+	
 	scroll = {}
 
 	frame = Frame(window)
@@ -146,83 +146,92 @@ def render_popup(event, word):
 		popup.geometry('%dx%d+%d+%d' % (0, 0, 0, 0))
 	except:
 		pass
-
-	pairs, word_descr = globals()[translation_function_name](word)
-
-	if not len(pairs):
-		#pairs = [['[Not found]', '']]
-		return
-
-	#pairs = [ [ str(i) + ' ' + pair[0], pair[1] ] for i, pair in enumerate(pairs) ]
-
-	if randomize_translations:
-		tmp_pairs = pairs[1:]
-		random.shuffle(tmp_pairs)
-		pairs = [pairs[0]] + tmp_pairs
-	elif word in scroll:
-		if len(pairs[scroll[word]:]) > number_of_translations:
-			pairs = pairs[scroll[word]:]
-		else:
-			pairs = pairs[-number_of_translations:]
-			scroll[word] = scroll[word] - 1
-
+	
 	popup = Toplevel(root)
 	popup.geometry('+%d+%d' % (ws+999, hs+999))
 	popup.overrideredirect(1)
 	popup.configure(background = bg_color2, padx = popup_ext_n_int_padding, pady = popup_ext_n_int_padding)
 
 	wrplgth = ws - ws/3
+	
+	for translation_function_name_i, translation_function_name in enumerate(translation_function_names):
+		pairs, word_descr = globals()[translation_function_name](word)
 
-	for i, pair in enumerate(pairs):
-		if i == number_of_translations:
-			break
+		if not len(pairs):
+			#pairs = [['[Not found]', '']]
+			return
 
-		if pair[0] == '-':
-			pair[0] = ''
-		if pair[1] == '-':
-			pair[1] = ''
+		#pairs = [ [ str(i) + ' ' + pair[0], pair[1] ] for i, pair in enumerate(pairs) ]
+		
+		if randomize_translations:
+			tmp_pairs = pairs[1:]
+			random.shuffle(tmp_pairs)
+			pairs = [pairs[0]] + tmp_pairs
+		elif word in scroll:
+			if len(pairs[scroll[word]:]) > number_of_translations:
+				pairs = pairs[scroll[word]:]
+			else:
+				pairs = pairs[-number_of_translations:]
+				if len(translation_function_names) == 1:
+					scroll[word] = scroll[word] - 1
 
-		anchor1 = "w"
-		anchor2 = "w"
-		if R2L_from:
-			pair[0] = pair[0][::-1]
-			anchor1 = "e"
-		if R2L_to:
-			pair[1] = pair[1][::-1]
-			anchor2 = "e"
+		for i, pair in enumerate(pairs):
+			if i == number_of_translations:
+				break
+			
+			# couldn't control padding of one side, thus:
+			if i:
+				Label(popup, pady = 0, background = bg_color2).pack(side = "top")
 
-		# to emphasize the exact form of the word
-		psdo_label = Frame(popup)
-		psdo_label.pack(side = "top", anchor = anchor1)
-		psdo_label.configure(borderwidth = 0, padx = popup_ext_n_int_padding, pady = 0, background = bg_color2)
+			if pair[0] == '-':
+				pair[0] = ''
+			if pair[1] == '-':
+				pair[1] = ''
 
-		# to ignore case on input and match it on output
-		chnks = re.split(word, pair[0], flags=re.I)
-		exct_words = re.findall(word, pair[0], flags=re.I)
+			anchor1 = "w"
+			anchor2 = "w"
+			if R2L_from:
+				pair[0] = pair[0][::-1]
+				anchor1 = "e"
+			if R2L_to:
+				pair[1] = pair[1][::-1]
+				anchor2 = "e"
 
-		for i, chnk in enumerate(chnks):
-			if len(chnk):
-				Label(psdo_label, text = chnk, font = font2, borderwidth = 0, padx = 0, pady = 0, background = bg_color2, foreground = font_color2, highlightthickness = 0, wraplength = wrplgth, justify = "left").pack(side = "left", anchor = "w")
-			if i + 1 < len(chnks):
-				Label(psdo_label, text = exct_words[i], font = font2 + ('underline',), borderwidth = 0, padx = 0, pady = 0, background = bg_color2, foreground = font_color2, highlightthickness = 0, wraplength = wrplgth, justify = "left").pack(side = "left", anchor = "w")
+			# to emphasize the exact form of the word
+			psdo_label = Frame(popup)
+			psdo_label.pack(side = "top", anchor = anchor1)
+			psdo_label.configure(borderwidth = 0, padx = popup_ext_n_int_padding, pady = 0, background = bg_color2)
 
-		Label(popup, text = pair[1], font = font2, borderwidth = 0, padx = popup_ext_n_int_padding, pady = 0, background = bg_color2, foreground = font_color3, highlightthickness = 0, wraplength = wrplgth, justify = "left").pack(side = "top", anchor = anchor2)
+			# to ignore case on input and match it on output
+			chnks = re.split(word, pair[0], flags=re.I)
+			exct_words = re.findall(word, pair[0], flags=re.I)
 
-		# couldn't control padding of one side, thus:
-		Label(popup, pady = 0, background = bg_color2).pack(side = "top")
+			for i, chnk in enumerate(chnks):
+				if len(chnk):
+					Label(psdo_label, text = chnk, font = font2, borderwidth = 0, padx = 0, pady = 0, background = bg_color2, foreground = font_color2, highlightthickness = 0, wraplength = wrplgth, justify = "left").pack(side = "left", anchor = "w")
+				if i + 1 < len(chnks):
+					Label(psdo_label, text = exct_words[i], font = font2 + ('underline',), borderwidth = 0, padx = 0, pady = 0, background = bg_color2, foreground = font_color2, highlightthickness = 0, wraplength = wrplgth, justify = "left").pack(side = "left", anchor = "w")
 
-	if len(word_descr[0]):
-		if word_descr[1] == 'm':
-			word_descr_color = font_color5
-		elif word_descr[1] == 'f':
-			word_descr_color = font_color6
-		elif word_descr[1] == 'nt':
-			word_descr_color = font_color7
-		else:
-			word_descr_color = font_color4
+			Label(popup, text = pair[1], font = font2, borderwidth = 0, padx = popup_ext_n_int_padding, pady = 0, background = bg_color2, foreground = font_color3, highlightthickness = 0, wraplength = wrplgth, justify = "left").pack(side = "top", anchor = anchor2)
 
-		Label(popup, text = word_descr[0], font = font3, padx = popup_ext_n_int_padding, pady = 0, background = bg_color2, foreground = word_descr_color, wraplength = wrplgth, justify = "left").pack(side = "top", anchor = "e")
+		if len(word_descr[0]):
+			if word_descr[1] == 'm':
+				word_descr_color = font_color5
+			elif word_descr[1] == 'f':
+				word_descr_color = font_color6
+			elif word_descr[1] == 'nt':
+				word_descr_color = font_color7
+			else:
+				word_descr_color = font_color4
 
+			Label(popup, text = word_descr[0], font = font3, padx = popup_ext_n_int_padding, pady = 0, background = bg_color2, foreground = word_descr_color, wraplength = wrplgth, justify = "left").pack(side = "top", anchor = "e")
+			
+		if translation_function_name_i + 1 < len(translation_function_names):
+			Label(popup, font = ("Trebuchet MS", 1), background = bg_color2, height = 0, borderwidth = 0, padx = 0, pady = 1).pack(side = "top")
+			Label(popup, font = ("Trebuchet MS", 1), background = font_color3, height = 0, borderwidth = 0, padx = 0, pady = 0).pack(side = "top", fill = BOTH)
+			Label(popup, font = ("Trebuchet MS", 1), background = bg_color2, height = 0, borderwidth = 0, padx = 0, pady = 1).pack(side = "top")
+			
+		
 	popup.update_idletasks()
 
 	w = popup.winfo_width() + popup_ext_n_int_padding

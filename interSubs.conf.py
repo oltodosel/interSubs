@@ -1,4 +1,4 @@
-# v. 1.13
+# v. 1.14
 # Interactive subtitles for `mpv` for language learners.
 
 # BEWARE!
@@ -23,7 +23,7 @@ randomize_translations = 0			# True/False # every translation but first will be 
 R2L_from = 0						# True/False # translated language is written right-to-left, e.g Hebrew/arabic
 R2L_to = 0							# True/False # translation is written right-to-left, e.g Hebrew/arabic
 
-number_of_translations = 5			# number of translations in popup
+number_of_translations = 3			# number of translations in popup
 number_of_translations_to_save = 0	# number of translations to save in files for each word; 0 - to save all
 
 update_time = .01					# interval in seconds between checking for the next subtitle #
@@ -32,8 +32,8 @@ focus_checking_time = .1			# interval in seconds between checking if mpv is in f
 external_dictionary_cmd_on_click = 'chromium "http://www.linguee.com/german-english/search?source=german&query=${word}"'	# firefox "https://en.wiktionary.org/wiki/${word}"
 
 font1 = ("Trebuchet MS", 34)		# subtitles (font, size)
-font2 = ("Trebuchet MS", 30)		# [popup] original language & translation
-font3 = ("Trebuchet MS", 26)		# [popup] morphology
+font2 = ("Trebuchet MS", 28)		# [popup] original language & translation
+font3 = ("Trebuchet MS", 24)		# [popup] morphology
 font_color1 = '#BAC4D6'				# subtitles
 font_color2 = '#DCDCCC'				# [popup] original language
 font_color3 = '#8B8F88'				# [popup] translation
@@ -52,7 +52,8 @@ bg_color2 = '#2C2C2C'				# translation popup
 subs_bottom_padding = 5
 popup_ext_n_int_padding = 6
 
-translation_function_name = 'dict_cc'	# or other function's name you might write that will return ([[word, translation]..], [morphology = '', gender = ''])
+translation_function_names = ['pons', 'dict_cc']	# dictionaries to use, one or more.
+									# or other function's name you might write that will return ([[word, translation]..], [morphology = '', gender = ''])
 									# available: pons, reverso, dict_cc, mtranslate_google (one word translation - for uncommon languages)
 
 # for going through lines step by step
