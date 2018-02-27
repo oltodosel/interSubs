@@ -1,7 +1,9 @@
 interSubs
 =========
 
-v. 1.14
+v. 1.15
+
+1.14 > 1.15 - Added multi-threaded retrieval when using more than one dictionary. Works only with `save_translations = 1`
 
 1.13 > 1.14 - Added simultaneous use of multiple dictionaries. When using more than one - scrolling is infinite.
 
