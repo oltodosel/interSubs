@@ -1,6 +1,6 @@
 #! /usr/bin/env python
 
-# v. 1.15
+# v. 1.16
 # Interactive subtitles for `mpv` for language learners.
 
 import os, subprocess, sys
@@ -142,8 +142,12 @@ def render_subtitles():
 	window.geometry('')
 
 def render_popup(event, word):
-	global popup, scroll
-
+	global popup, scroll, frame
+	
+	# transform cursor into hourglass while fetching translation
+	# https://www.tcl.tk/man/tcl8.6/TkCmd/cursors.htm
+	frame.config(cursor="watch")
+	
 	try:
 		popup.geometry('%dx%d+%d+%d' % (0, 0, 0, 0))
 	except:
@@ -243,7 +247,8 @@ def render_popup(event, word):
 			Label(popup, font = ("Trebuchet MS", 1), background = font_color3, height = 0, borderwidth = 0, padx = 0, pady = 0).pack(side = "top", fill = BOTH)
 			Label(popup, font = ("Trebuchet MS", 1), background = bg_color2, height = 0, borderwidth = 0, padx = 0, pady = 1).pack(side = "top")
 			
-		
+	# switching cursor back
+	frame.config(cursor="")
 	popup.update_idletasks()
 
 	w = popup.winfo_width() + popup_ext_n_int_padding
