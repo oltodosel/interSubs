@@ -1,6 +1,6 @@
 #! /usr/bin/env python
 
-# v. 1.14
+# v. 1.15
 # Interactive subtitles for `mpv` for language learners.
 
 import os, subprocess, sys
@@ -20,6 +20,8 @@ import base64
 
 import numpy
 from bs4 import BeautifulSoup
+
+import threading
 
 def render_subtitles():
 	global frame, subs_hight, scroll
@@ -153,6 +155,16 @@ def render_popup(event, word):
 	popup.configure(background = bg_color2, padx = popup_ext_n_int_padding, pady = popup_ext_n_int_padding)
 
 	wrplgth = ws - ws/3
+	
+	# retrieving translations simultaneously
+	if save_translations and len(translation_function_names) > 1:
+		threads = []
+		for translation_function_name in translation_function_names:
+			threads.append(threading.Thread(target = globals()[translation_function_name], args = (word,)))
+		for x in threads:
+			x.start()
+		for x in threads:
+			x.join()
 	
 	for translation_function_name_i, translation_function_name in enumerate(translation_function_names):
 		pairs, word_descr = globals()[translation_function_name](word)
