@@ -77,4 +77,4 @@ Changelog
 -----
 - 1.14 - Added simultaneous use of multiple dictionaries. When using more than one - scrolling is infinite.
 - 1.15 - Added multi-threaded retrieval when using more than one dictionary. Works only with `save_translations = 1`
-- 1.16 - Added waiting cursor
+- 1.16 - Added waiting cursor. Minor errors correction.
