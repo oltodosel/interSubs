@@ -174,8 +174,8 @@ def render_popup(event, word):
 		pairs, word_descr = globals()[translation_function_name](word)
 
 		if not len(pairs):
-			#pairs = [['[Not found]', '']]
-			return
+			pairs = [['', '[Not found]']]
+			#return
 
 		#pairs = [ [ str(i) + ' ' + pair[0], pair[1] ] for i, pair in enumerate(pairs) ]
 		
@@ -281,10 +281,11 @@ def pons(word):
 				word_descr = p[1].strip()
 			except:
 				word_descr = ''
-
-			for pi in p[0].strip().split('\n\n'):
-				pi = pi.split('\n')
-				pairs.append([pi[0], pi[1]])
+			
+			if len(p[0].strip()):
+				for pi in p[0].strip().split('\n\n'):
+					pi = pi.split('\n')
+					pairs.append([pi[0], pi[1]])
 		else:
 			error
 	except:
@@ -313,8 +314,11 @@ def pons(word):
 
 		try:
 			word_descr = soup.find_all('h2', class_ = '')
-			word_descr = re.sub('\n|\r|\t', ' ', word_descr[0].get_text())
-			word_descr = re.sub(' +', ' ', word_descr).replace('&lt;', '<').replace('&gt;', '>').replace(' · ', '·').replace(' , ', ', ').strip()
+			if '<i class="icon-bolt">' not in str(word_descr[0]):
+				word_descr = re.sub('\n|\r|\t', ' ', word_descr[0].get_text())
+				word_descr = re.sub(' +', ' ', word_descr).replace('&lt;', '<').replace('&gt;', '>').replace(' · ', '·').replace(' , ', ', ').strip()
+			else:
+				word_descr = ''
 		except:
 			word_descr = ''
 
@@ -381,10 +385,11 @@ def reverso(word):
 	try:
 		if save_translations:
 			p = open('urls/' + url.replace('/',"-")).read().split('=====/////-----')
-
-			for pi in p[0].strip().split('\n\n'):
-				pi = pi.split('\n')
-				pairs.append([pi[0], pi[1]])
+			
+			if len(p[0].strip()):
+				for pi in p[0].strip().split('\n\n'):
+					pi = pi.split('\n')
+					pairs.append([pi[0], pi[1]])
 		else:
 			error
 	except:
@@ -471,9 +476,10 @@ def dict_cc(word):
 			except:
 				word_descr = ''
 
-			for pi in p[0].strip().split('\n\n'):
-				pi = pi.split('\n')
-				pairs.append([pi[0], pi[1]])
+			if len(p[0].strip()):
+				for pi in p[0].strip().split('\n\n'):
+					pi = pi.split('\n')
+					pairs.append([pi[0], pi[1]])
 		else:
 			error
 	except:
