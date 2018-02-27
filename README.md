@@ -3,10 +3,6 @@ interSubs
 
 v. 1.15
 
-1.14 > 1.15 - Added multi-threaded retrieval when using more than one dictionary. Works only with `save_translations = 1`
-
-1.13 > 1.14 - Added simultaneous use of multiple dictionaries. When using more than one - scrolling is infinite.
-
 Interactive subtitles for `mpv`, that was made to help study languages. Easily tweaked and customizable.
 
  - Uses https://dict.cc/, http://pons.com/, http://reverso.net/ or Google for translation and http://linguee.com/ redirecting to browser by click.
@@ -75,3 +71,9 @@ Important
 -----
 - By default works only in fullscreen.
 - May have issues working in a multi-monitor system.
+
+
+Changelog
+-----
+- 1.14 - Added simultaneous use of multiple dictionaries. When using more than one - scrolling is infinite.
+- 1.15 - Added multi-threaded retrieval when using more than one dictionary. Works only with `save_translations = 1`
