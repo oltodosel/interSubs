@@ -1,7 +1,7 @@
 interSubs
 =========
 
-v. 1.15
+v. 1.16
 
 Interactive subtitles for `mpv`, that was made to help study languages. Easily tweaked and customizable.
 
@@ -77,3 +77,4 @@ Changelog
 -----
 - 1.14 - Added simultaneous use of multiple dictionaries. When using more than one - scrolling is infinite.
 - 1.15 - Added multi-threaded retrieval when using more than one dictionary. Works only with `save_translations = 1`
+- 1.16 - Added waiting cursor
