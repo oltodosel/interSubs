@@ -142,12 +142,12 @@ def render_subtitles():
 	window.geometry('')
 
 def render_popup(event, word):
-	global popup, scroll, frame
+	global popup, scroll
 	
 	# transform cursor into hourglass while fetching translation
 	# https://www.tcl.tk/man/tcl8.6/TkCmd/cursors.htm
-	frame.config(cursor="")				# without this hourglass stops reappearing
 	frame.config(cursor="watch")
+	frame.update_idletasks()
 	
 	try:
 		popup.geometry('%dx%d+%d+%d' % (0, 0, 0, 0))
@@ -250,6 +250,7 @@ def render_popup(event, word):
 			
 	# switching cursor back
 	frame.config(cursor="")
+	frame.update_idletasks()
 	popup.update_idletasks()
 
 	w = popup.winfo_width() + popup_ext_n_int_padding
