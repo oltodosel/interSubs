@@ -146,6 +146,7 @@ def render_popup(event, word):
 	
 	# transform cursor into hourglass while fetching translation
 	# https://www.tcl.tk/man/tcl8.6/TkCmd/cursors.htm
+	frame.config(cursor="")				# without this hourglass stops reappearing
 	frame.config(cursor="watch")
 	
 	try:
