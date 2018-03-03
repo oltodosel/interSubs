@@ -1,6 +1,6 @@
 #! /usr/bin/env python
 
-# v. 1.16
+# v. 1.17
 # Interactive subtitles for `mpv` for language learners.
 
 import os, subprocess, sys
@@ -251,6 +251,7 @@ def render_popup(event, word):
 	# switching cursor back
 	frame.config(cursor="")
 	frame.update_idletasks()
+	
 	popup.update_idletasks()
 
 	w = popup.winfo_width() + popup_ext_n_int_padding
@@ -531,12 +532,12 @@ def wheel_ev(event, word = ''):
 				else:
 					scroll[word] = 0
 				render_popup(event, word)
-		elif event.state == 1:
+		elif event.state == 4:
 			font1 = (font1[0], font1[1] + 1)
 			mpv_message('font1: ' + str(font1))
 			beysc()
 			render_subtitles()
-		elif event.state == 4:
+		elif event.state == 1:
 			subs_bottom_padding += 5
 			mpv_message('subs_bottom_padding: ' + str(subs_bottom_padding))
 			beysc()
@@ -549,12 +550,12 @@ def wheel_ev(event, word = ''):
 				else:
 					scroll[word] = 1
 				render_popup(event, word)
-		elif event.state == 1:
+		elif event.state == 4:
 			font1 = (font1[0], font1[1] - 1)
 			mpv_message('font1: ' + str(font1))
 			beysc()
 			render_subtitles()
-		elif event.state == 4:
+		elif event.state == 1:
 			subs_bottom_padding -= 5
 			mpv_message('subs_bottom_padding: ' + str(subs_bottom_padding))
 			beysc()
@@ -591,19 +592,20 @@ def listen(word, type = 'gtts'):
 
 		try:
 			data = requests.get(url, headers={'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.167 Safari/537.36'}).text
-
+			
 			soup = BeautifulSoup(data, "lxml")
-			trs = soup.find_all('article', class_ = 'pronunciations')[0].find_all('a', class_ = 'play')
-
+			trs = soup.find_all('article', class_ = 'pronunciations')[0].find_all('span', class_ = 'play')
+			
+			mp3s = ''
 			for tr in trs[:2]:
 				tr = tr['onclick']
 				tr = re.findall('Play\((.*?)\)', tr)[0]
 				tr = tr.split(',')[4].replace("'", '')
 				tr = base64.b64decode(tr)
 				tr = tr.decode("utf-8")
-				print(tr)
 
-				os.system('(mpv --load-scripts=no --loop=2 --volume=111 --force-window=no https://audio00.forvo.com/audios/mp3/%s) &' % tr)
+				mp3s += 'mpv --load-scripts=no --loop=1 --volume=111 --force-window=no https://audio00.forvo.com/audios/mp3/%s ; ' % tr
+			os.system('(%s) &' % mp3s)
 		except:
 			return
 
