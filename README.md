@@ -1,7 +1,7 @@
 interSubs
 =========
 
-v. 1.16
+v. 1.17
 
 Interactive subtitles for `mpv`, that was made to help study languages. Easily tweaked and customizable.
 
@@ -62,8 +62,8 @@ Usage
 - Click on the word to look it up on another translator in the browser.
 - Right-click on the word to hear its pronunciation.
 - Wheel - scroll through transitions in popup.
-- Wheel+Shift - resize subtitles.
-- Wheel+Ctrl - change subtitles' vertical position.
+- Wheel+Ctrl - resize subtitles.
+- Wheel+Shift - change subtitles' vertical position.
 - Wheel-click - cycle through auto_pause options.
 - Wheel-click-left/right - +/- auto_pause_min_words. (fancy mouses)
 
@@ -78,3 +78,4 @@ Changelog
 - 1.14 - Added simultaneous use of multiple dictionaries. When using more than one - scrolling is infinite.
 - 1.15 - Added multi-threaded retrieval when using more than one dictionary. Works only with `save_translations = 1`
 - 1.16 - Added waiting cursor. Minor errors correction.
+- 1.17 - Minor errors correction.
