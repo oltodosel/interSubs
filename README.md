@@ -1,11 +1,11 @@
 interSubs
 =========
 
-v. 1.17
+v. 1.18
 
 Interactive subtitles for `mpv`, that was made to help study languages. Easily tweaked and customizable.
 
- - Uses https://dict.cc/, http://pons.com/, http://reverso.net/ or Google for translation and http://linguee.com/ redirecting to browser by click.
+ - Uses https://dict.cc/, http://pons.com/, http://reverso.net/, https://redensarten-index.de/ or Google for translation and http://linguee.com/ redirecting to browser by click.
  - Can use multiple dictionaries simultaneously. 
 - Linguee, unlike others, bans excessive usage by IP, so don't overuse it or write scrapping functions for it.
 -
@@ -79,3 +79,4 @@ Changelog
 - 1.15 - Added multi-threaded retrieval when using more than one dictionary. Works only with `save_translations = 1`
 - 1.16 - Added waiting cursor. Minor errors correction.
 - 1.17 - Minor errors correction.
+- 1.18 - Added redensarten-index.de support (German idioms).
