@@ -1,4 +1,4 @@
-# v. 1.14
+# v. 1.18
 # Interactive subtitles for `mpv` for language learners.
 
 # BEWARE!
@@ -31,9 +31,9 @@ focus_checking_time = .1			# interval in seconds between checking if mpv is in f
 
 external_dictionary_cmd_on_click = 'chromium "http://www.linguee.com/german-english/search?source=german&query=${word}"'	# firefox "https://en.wiktionary.org/wiki/${word}"
 
-font1 = ("Trebuchet MS", 34)		# subtitles (font, size)
-font2 = ("Trebuchet MS", 28)		# [popup] original language & translation
-font3 = ("Trebuchet MS", 24)		# [popup] morphology
+font1 = ("Trebuchet MS", 32)		# subtitles (font, size)
+font2 = ("Trebuchet MS", 27)		# [popup] original language & translation
+font3 = ("Trebuchet MS", 23)		# [popup] morphology
 font_color1 = '#BAC4D6'				# subtitles
 font_color2 = '#DCDCCC'				# [popup] original language
 font_color3 = '#8B8F88'				# [popup] translation
@@ -52,9 +52,9 @@ bg_color2 = '#2C2C2C'				# translation popup
 subs_bottom_padding = 5
 popup_ext_n_int_padding = 6
 
-translation_function_names = ['pons', 'dict_cc']	# dictionaries to use, one or more.
+translation_function_names = ['pons', 'dict_cc', 'redensarten']	# dictionaries to use, one or more.
 									# or other function's name you might write that will return ([[word, translation]..], [morphology = '', gender = ''])
-									# available: pons, reverso, dict_cc, mtranslate_google (one word translation - for uncommon languages)
+									# available: pons, reverso, dict_cc, mtranslate_google (one word translation - for uncommon languages), redensarten (redensarten-index.de - German idioms etc.)
 
 # for going through lines step by step
 auto_pause_min_words = 10			# skip pausing when subs are less then X words
@@ -72,4 +72,4 @@ colorize_nouns = 0 					# colorize nouns by gender; German only with given dicti
 # exact genders are Masc/Fem/Neut
 colorization_dict = 'interSubs.delexicon.txt'
 
-listen_via = 'forvo'					# gtts|pons|forvo # gtts is google-text-to-speech
+listen_via = 'gtts'					# gtts|pons|forvo # gtts is google-text-to-speech
