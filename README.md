@@ -17,7 +17,7 @@ Interactive subtitles for `mpv`, that was made to help study languages. Easily t
 - Can colorize nouns by gender; German only with given dictionary.
 - Works with right-to-left writing.
 - Autodetects Hebrew and switches to r2l.
-- Reassigning buttons functions in config.
+- Reassigning buttons' functions in config.
 - Can extend time of subs showing; for slow readers
 
 ```
