@@ -1,13 +1,15 @@
 interSubs
 =========
 
-v. 1.18
+v. 1.19
 
 Interactive subtitles for `mpv`, that was made to help study languages. Easily tweaked and customizable.
 
- - Uses https://dict.cc/, http://pons.com/, http://reverso.net/, https://redensarten-index.de/ or Google for translation and http://linguee.com/ redirecting to browser by click.
- - Can use multiple dictionaries simultaneously. 
-- Linguee, unlike others, bans excessive usage by IP, so don't overuse it or write scrapping functions for it.
+- https://dict.cc/, https://pons.com/, http://reverso.net/, https://redensarten-index.de/ or Google for single words.
+- https://www.deepl.com/translator for whole sentences.
+- http://linguee.com/ redirecting to browser by click.
+- https://forvo.com/, https://pons.com/ or Google for pronouncing single words.
+- Can use multiple dictionaries simultaneously. 
 -
 - Doesn't work with DVD (picture based) subtitles, only the text-based ones.
 - To convert picture based subtitles into *.srt - https://github.com/oltodosel/extract_n_convert_dvd_bd_subtitles
@@ -15,6 +17,7 @@ Interactive subtitles for `mpv`, that was made to help study languages. Easily t
 - Can colorize nouns by gender; German only with given dictionary.
 - Works with right-to-left writing.
 - Autodetects Hebrew and switches to r2l.
+- Reassigning buttons functions in config.
 - Can extend time of subs showing; for slow readers
 
 ```
@@ -59,6 +62,9 @@ Usage
 - Start video with mpv & select subtitles.
 - Press F5 to start/stop interSubs.
 - Point cursor over the word to get popup with translation.
+
+buttons bellow may be reassigned
+-----
 - Click on the word to look it up on another translator in the browser.
 - Right-click on the word to hear its pronunciation.
 - Wheel - scroll through transitions in popup.
@@ -66,6 +72,7 @@ Usage
 - Wheel+Shift - change subtitles' vertical position.
 - Wheel-click - cycle through auto_pause options.
 - Wheel-click-left/right - +/- auto_pause_min_words. (fancy mouses)
+- Wheel-back - translate whole sentence.
 
 Important
 -----
@@ -80,3 +87,6 @@ Changelog
 - 1.16 - Added waiting cursor. Minor errors correction.
 - 1.17 - Minor errors correction.
 - 1.18 - Added redensarten-index.de support (German idioms).
+- 1.19 - Added option to reassign buttons.
+         Added support for deepl.com; to translate whole sentences. Supported languages: de, en, fr, es, it, nl, pl.
+         Version are not back compatible with previous config.
