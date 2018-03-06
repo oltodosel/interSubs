@@ -1,4 +1,4 @@
-# v. 1.18
+# v. 1.19
 # Interactive subtitles for `mpv` for language learners.
 
 # BEWARE!
@@ -29,8 +29,6 @@ number_of_translations_to_save = 0	# number of translations to save in files for
 update_time = .01					# interval in seconds between checking for the next subtitle #
 focus_checking_time = .1			# interval in seconds between checking if mpv is in focus using `xdotool` and/or in fullscreen
 
-external_dictionary_cmd_on_click = 'chromium "http://www.linguee.com/german-english/search?source=german&query=${word}"'	# firefox "https://en.wiktionary.org/wiki/${word}"
-
 font1 = ("Trebuchet MS", 32)		# subtitles (font, size)
 font2 = ("Trebuchet MS", 27)		# [popup] original language & translation
 font3 = ("Trebuchet MS", 23)		# [popup] morphology
@@ -52,9 +50,16 @@ bg_color2 = '#2C2C2C'				# translation popup
 subs_bottom_padding = 5
 popup_ext_n_int_padding = 6
 
+show_in_browser = 'chromium "http://www.linguee.com/german-english/search?source=german&query=${word}"'	# firefox "https://en.wiktionary.org/wiki/${word}"
+
 translation_function_names = ['pons', 'dict_cc', 'redensarten']	# dictionaries to use, one or more.
 									# or other function's name you might write that will return ([[word, translation]..], [morphology = '', gender = ''])
-									# available: pons, reverso, dict_cc, mtranslate_google (one word translation - for uncommon languages), redensarten (redensarten-index.de - German idioms etc.)
+									# available:
+									# pons
+									# reverso
+									# dict_cc
+									# mtranslate_google (one word translation - for uncommon languages)
+									# redensarten (redensarten-index.de - German idioms etc.)
 
 # for going through lines step by step
 auto_pause_min_words = 10			# skip pausing when subs are less then X words
@@ -73,3 +78,64 @@ colorize_nouns = 0 					# colorize nouns by gender; German only with given dicti
 colorization_dict = 'interSubs.delexicon.txt'
 
 listen_via = 'gtts'					# gtts|pons|forvo # gtts is google-text-to-speech
+
+translate_whole_sentences = 1		# translate whole sentences with deepl.com
+									# mouse-button = 8
+
+
+# reassigning mouse buttons
+# functions' names are self-explanatory
+
+# [1, 0, 'f_show_in_browser']
+# [mouse_event, modifier_key, 'self_explanatory_function_name']
+
+# mouse_event:
+	# 1 == left-click
+	# 2 == middle-click(wheel)
+	# 3 == right-click
+	# 4 == wheel down
+	# 5 == wheel up
+	# 6 == [non-standart] wheel left-click
+	# 7 == [non-standart] wheel right-click
+	# 8 == [non-standart] forward-button
+	# 9 == [non-standart] back-button
+
+# modifier_key:
+	# 0 == None
+	# 1 == Shift
+	# 4 == Ctrl
+
+# self_explanatory_function_name:
+	# f_show_in_browser
+	# f_auto_pause_options
+	# f_listen
+	# f_scroll_translations_down
+	# f_scroll_translations_up
+	# f_subs_bottom_padding_decrease
+	# f_subs_bottom_padding_increase
+	# f_font_size_decrease
+	# f_font_size_increase
+	# f_auto_pause_min_words_decrease
+	# f_auto_pause_min_words_increase
+	# f_deepl_translation
+	
+mouse_buttons = [
+	[1, 0, 'f_show_in_browser'],
+	[2, 0, 'f_auto_pause_options'],
+	[3, 0, 'f_listen'],
+	
+	[4, 0, 'f_scroll_translations_down'],
+	[5, 0, 'f_scroll_translations_up'],
+	
+	[4, 1, 'f_subs_bottom_padding_decrease'],
+	[5, 1, 'f_subs_bottom_padding_increase'],
+	
+	[4, 4, 'f_font_size_decrease'],
+	[5, 4, 'f_font_size_increase'],
+	
+	[6, 0, 'f_auto_pause_min_words_decrease'],
+	[7, 0, 'f_auto_pause_min_words_increase'],
+	[8, 0, 'f_deepl_translation'],
+	
+	[9, 0, ''],
+]

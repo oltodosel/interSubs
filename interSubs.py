@@ -1,6 +1,6 @@
 #! /usr/bin/env python
 
-# v. 1.18
+# v. 1.19
 # Interactive subtitles for `mpv` for language learners.
 
 import os, subprocess, sys
@@ -38,16 +38,24 @@ def render_subtitles():
 	if not len(subs):
 		return
 	
-	scroll = {}
+	scroll = {} 
+	
+	# if subtitle consists of one overly long line - split into two
+	if split_long_lines and len(subs.split('\n')) == 1 and len(subs.split(' ')) > split_long_lines_words_min - 1:
+		subs2 = ' '.join(numpy.array_split(subs.split(' '), 2)[0]) + '\n' + ' '.join(numpy.array_split(subs.split(' '), 2)[1])
+	else:
+		subs2 = subs
+
+	subs2 = re.sub(' +', ' ', subs2)
 
 	frame = Frame(window)
 	frame.configure(background = bg_color1, padx = 3, pady = 0)
 	frame.pack()
-	frame.bind("<Button>", wheel_ev)
-
+	frame.bind("<Button>", lambda event, arg = '': wheel_ev(event, arg, subs2))
+	
 	if pause_during_translation:
 		frame.bind("<Enter>", mpv_pause)
-		frame.bind("<Leave>", mpv_resume)
+		frame.bind("<Leave>", lambda event: mpv_resume(event, ppd = True))
 
 	# putting first line without its own frame won't center it when second line is longer
 	frame1 = Frame(frame)
@@ -56,14 +64,6 @@ def render_subtitles():
 	frame2 = Frame(frame)
 	frame2.configure(background = bg_color1)
 	frame2.pack()
-
-	# if subtitle consists of one overly long line - split into two
-	if split_long_lines and len(subs.split('\n')) == 1 and len(subs.split(' ')) > split_long_lines_words_min - 1:
-		subs2 = ' '.join(numpy.array_split(subs.split(' '), 2)[0]) + '\n' + ' '.join(numpy.array_split(subs.split(' '), 2)[1])
-	else:
-		subs2 = subs
-
-	subs2 = re.sub(' +', ' ', subs2)
 
 	for i1, line in enumerate(subs2.split('\n')):
 		line = line.strip()
@@ -119,7 +119,7 @@ def render_subtitles():
 					bb.pack(side = LEFT)
 					bb.bind("<Enter>", lambda event, arg = word: render_popup(event, arg))
 					bb.bind("<Leave>", lambda event: popup.destroy())
-					bb.bind("<Button>", lambda event, arg = word: wheel_ev(event, arg))
+					bb.bind("<Button>", lambda event, arg = word: wheel_ev(event, arg, subs2))
 
 					word = ''
 
@@ -141,7 +141,7 @@ def render_subtitles():
 	window.geometry('%dx%d+%d+%d' % (w, h, x, y))
 	window.geometry('')
 
-def render_popup(event, word):
+def render_popup(event, word, line = False):
 	global popup, scroll
 	
 	# transform cursor into hourglass while fetching translation
@@ -161,92 +161,99 @@ def render_popup(event, word):
 
 	wrplgth = ws - ws/3
 	
-	# retrieving translations simultaneously
-	if save_translations and len(translation_function_names) > 1:
-		threads = []
-		for translation_function_name in translation_function_names:
-			threads.append(threading.Thread(target = globals()[translation_function_name], args = (word,)))
-		for x in threads:
-			x.start()
-		for x in threads:
-			x.join()
-	
-	for translation_function_name_i, translation_function_name in enumerate(translation_function_names):
-		pairs, word_descr = globals()[translation_function_name](word)
-
-		if not len(pairs):
-			pairs = [['', '[Not found]']]
-			#return
-
-		#pairs = [ [ str(i) + ' ' + pair[0], pair[1] ] for i, pair in enumerate(pairs) ]
+	if line:
+		line = deepl(line)
+		if split_long_lines and len(subs.split('\n')) == 1 and len(subs.split(' ')) > split_long_lines_words_min - 1:
+			line = ' '.join(numpy.array_split(line.split(' '), 2)[0]) + '\n' + ' '.join(numpy.array_split(line.split(' '), 2)[1])
 		
-		if randomize_translations:
-			tmp_pairs = pairs[1:]
-			random.shuffle(tmp_pairs)
-			pairs = [pairs[0]] + tmp_pairs
-		elif word in scroll:
-			if len(pairs[scroll[word]:]) > number_of_translations:
-				pairs = pairs[scroll[word]:]
-			else:
-				pairs = pairs[-number_of_translations:]
-				if len(translation_function_names) == 1:
-					scroll[word] = scroll[word] - 1
+		Label(popup, text = line, font = font1, borderwidth = 0, padx = 0, pady = 0, background = bg_color2, foreground = font_color2, highlightthickness = 0, wraplength = wrplgth, justify = "left").pack(side = "left", anchor = "w")
+	else:
+		# retrieving translations simultaneously
+		if save_translations and len(translation_function_names) > 1:
+			threads = []
+			for translation_function_name in translation_function_names:
+				threads.append(threading.Thread(target = globals()[translation_function_name], args = (word,)))
+			for x in threads:
+				x.start()
+			for x in threads:
+				x.join()
+		
+		for translation_function_name_i, translation_function_name in enumerate(translation_function_names):
+			pairs, word_descr = globals()[translation_function_name](word)
 
-		for i, pair in enumerate(pairs):
-			if i == number_of_translations:
-				break
+			if not len(pairs):
+				pairs = [['', '[Not found]']]
+				#return
+
+			#pairs = [ [ str(i) + ' ' + pair[0], pair[1] ] for i, pair in enumerate(pairs) ]
 			
-			# couldn't control padding of one side, thus:
-			if i:
-				Label(popup, pady = 0, background = bg_color2).pack(side = "top")
+			if randomize_translations:
+				tmp_pairs = pairs[1:]
+				random.shuffle(tmp_pairs)
+				pairs = [pairs[0]] + tmp_pairs
+			elif word in scroll:
+				if len(pairs[scroll[word]:]) > number_of_translations:
+					pairs = pairs[scroll[word]:]
+				else:
+					pairs = pairs[-number_of_translations:]
+					if len(translation_function_names) == 1:
+						scroll[word] = scroll[word] - 1
 
-			if pair[0] == '-':
-				pair[0] = ''
-			if pair[1] == '-':
-				pair[1] = ''
+			for i, pair in enumerate(pairs):
+				if i == number_of_translations:
+					break
+				
+				# couldn't control padding of one side, thus:
+				if i:
+					Label(popup, pady = 0, background = bg_color2).pack(side = "top")
 
-			anchor1 = "w"
-			anchor2 = "w"
-			if R2L_from:
-				pair[0] = pair[0][::-1]
-				anchor1 = "e"
-			if R2L_to:
-				pair[1] = pair[1][::-1]
-				anchor2 = "e"
+				if pair[0] == '-':
+					pair[0] = ''
+				if pair[1] == '-':
+					pair[1] = ''
 
-			# to emphasize the exact form of the word
-			psdo_label = Frame(popup)
-			psdo_label.pack(side = "top", anchor = anchor1)
-			psdo_label.configure(borderwidth = 0, padx = popup_ext_n_int_padding, pady = 0, background = bg_color2)
+				anchor1 = "w"
+				anchor2 = "w"
+				if R2L_from:
+					pair[0] = pair[0][::-1]
+					anchor1 = "e"
+				if R2L_to:
+					pair[1] = pair[1][::-1]
+					anchor2 = "e"
 
-			# to ignore case on input and match it on output
-			chnks = re.split(word, pair[0], flags=re.I)
-			exct_words = re.findall(word, pair[0], flags=re.I)
+				# to emphasize the exact form of the word
+				psdo_label = Frame(popup)
+				psdo_label.pack(side = "top", anchor = anchor1)
+				psdo_label.configure(borderwidth = 0, padx = popup_ext_n_int_padding, pady = 0, background = bg_color2)
 
-			for i, chnk in enumerate(chnks):
-				if len(chnk):
-					Label(psdo_label, text = chnk, font = font2, borderwidth = 0, padx = 0, pady = 0, background = bg_color2, foreground = font_color2, highlightthickness = 0, wraplength = wrplgth, justify = "left").pack(side = "left", anchor = "w")
-				if i + 1 < len(chnks):
-					Label(psdo_label, text = exct_words[i], font = font2 + ('underline',), borderwidth = 0, padx = 0, pady = 0, background = bg_color2, foreground = font_color2, highlightthickness = 0, wraplength = wrplgth, justify = "left").pack(side = "left", anchor = "w")
+				# to ignore case on input and match it on output
+				chnks = re.split(word, pair[0], flags=re.I)
+				exct_words = re.findall(word, pair[0], flags=re.I)
 
-			Label(popup, text = pair[1], font = font2, borderwidth = 0, padx = popup_ext_n_int_padding, pady = 0, background = bg_color2, foreground = font_color3, highlightthickness = 0, wraplength = wrplgth, justify = "left").pack(side = "top", anchor = anchor2)
+				for i, chnk in enumerate(chnks):
+					if len(chnk):
+						Label(psdo_label, text = chnk, font = font2, borderwidth = 0, padx = 0, pady = 0, background = bg_color2, foreground = font_color2, highlightthickness = 0, wraplength = wrplgth, justify = "left").pack(side = "left", anchor = "w")
+					if i + 1 < len(chnks):
+						Label(psdo_label, text = exct_words[i], font = font2 + ('underline',), borderwidth = 0, padx = 0, pady = 0, background = bg_color2, foreground = font_color2, highlightthickness = 0, wraplength = wrplgth, justify = "left").pack(side = "left", anchor = "w")
 
-		if len(word_descr[0]):
-			if word_descr[1] == 'm':
-				word_descr_color = font_color5
-			elif word_descr[1] == 'f':
-				word_descr_color = font_color6
-			elif word_descr[1] == 'nt':
-				word_descr_color = font_color7
-			else:
-				word_descr_color = font_color4
+				Label(popup, text = pair[1], font = font2, borderwidth = 0, padx = popup_ext_n_int_padding, pady = 0, background = bg_color2, foreground = font_color3, highlightthickness = 0, wraplength = wrplgth, justify = "left").pack(side = "top", anchor = anchor2)
 
-			Label(popup, text = word_descr[0], font = font3, padx = popup_ext_n_int_padding, pady = 0, background = bg_color2, foreground = word_descr_color, wraplength = wrplgth, justify = "left").pack(side = "top", anchor = "e")
-			
-		if translation_function_name_i + 1 < len(translation_function_names):
-			Label(popup, font = ("Trebuchet MS", 1), background = bg_color2, height = 0, borderwidth = 0, padx = 0, pady = 1).pack(side = "top")
-			Label(popup, font = ("Trebuchet MS", 1), background = font_color3, height = 0, borderwidth = 0, padx = 0, pady = 0).pack(side = "top", fill = BOTH)
-			Label(popup, font = ("Trebuchet MS", 1), background = bg_color2, height = 0, borderwidth = 0, padx = 0, pady = 1).pack(side = "top")
+			if len(word_descr[0]):
+				if word_descr[1] == 'm':
+					word_descr_color = font_color5
+				elif word_descr[1] == 'f':
+					word_descr_color = font_color6
+				elif word_descr[1] == 'nt':
+					word_descr_color = font_color7
+				else:
+					word_descr_color = font_color4
+
+				Label(popup, text = word_descr[0], font = font3, padx = popup_ext_n_int_padding, pady = 0, background = bg_color2, foreground = word_descr_color, wraplength = wrplgth, justify = "left").pack(side = "top", anchor = "e")
+				
+			if translation_function_name_i + 1 < len(translation_function_names):
+				Label(popup, font = ("Trebuchet MS", 1), background = bg_color2, height = 0, borderwidth = 0, padx = 0, pady = 1).pack(side = "top")
+				Label(popup, font = ("Trebuchet MS", 1), background = font_color3, height = 0, borderwidth = 0, padx = 0, pady = 0).pack(side = "top", fill = BOTH)
+				Label(popup, font = ("Trebuchet MS", 1), background = bg_color2, height = 0, borderwidth = 0, padx = 0, pady = 1).pack(side = "top")
 			
 	# switching cursor back
 	frame.config(cursor="")
@@ -562,62 +569,125 @@ def redensarten(word):
 
 	return pairs, ['', '']
 
-def wheel_ev(event, word = ''):
-	global subs_bottom_padding, font1, scroll, auto_pause, auto_pause_min_words
+# deepl.com
+# https://github.com/EmilioK97/pydeepl
+def deepl(text):
+	l1 = lang_from.upper()
+	l2 = lang_to.upper()
 	
-	# event.state: Ctrl == 4, Shift == 1, None == 0
-	if event.num == 1:
-		os.system(external_dictionary_cmd_on_click.replace('${word}', word))
-	elif event.num == 2:
+	if len(text) > 5000:
+		return 'Text too long (limited to 5000 characters).'
+	
+	parameters = {
+		'jsonrpc': '2.0',
+		'method': 'LMT_handle_jobs',
+		'params': {
+			'jobs': [
+				{
+					'kind':'default',
+					'raw_en_sentence': text
+				}
+			],
+			'lang': {
+				'user_preferred_langs': [
+					l1,
+					l2
+				],
+				'source_lang_user_selected': l1,
+				'target_lang': l2
+			},
+		},
+	}
+
+	response = requests.post('https://www.deepl.com/jsonrpc', json=parameters).json()
+
+	if 'result' not in response:
+		return 'DeepL call resulted in a unknown result.'
+
+	translations = response['result']['translations']
+
+	if len(translations) == 0 \
+			or translations[0]['beams'] is None \
+			or translations[0]['beams'][0]['postprocessed_sentence'] is None:
+		return 'No translations found.'
+
+	return translations[0]['beams'][0]['postprocessed_sentence']
+
+def wheel_ev(event, word = '', line = ''):
+	def f_show_in_browser(word):
+		os.system(show_in_browser.replace('${word}', word))
+		
+	def f_auto_pause_options():
 		if auto_pause == 2:
 			auto_pause = 0
 		else:
 			auto_pause += 1
 		mpv_message('auto_pause: ' + str(auto_pause))
-	elif event.num == 3:
+		
+	def f_listen(word):
 		listen(word, listen_via)
-	elif event.num == 4:
-		if event.state == 0:
-			if save_translations:
-				if word in scroll and scroll[word] > 0:
-					scroll[word] = scroll[word] - 1
-				else:
-					scroll[word] = 0
-				render_popup(event, word)
-		elif event.state == 4:
-			font1 = (font1[0], font1[1] + 1)
-			mpv_message('font1: ' + str(font1))
-			beysc()
-			render_subtitles()
-		elif event.state == 1:
-			subs_bottom_padding += 5
-			mpv_message('subs_bottom_padding: ' + str(subs_bottom_padding))
-			beysc()
-			render_subtitles()
-	elif event.num == 5:
-		if event.state == 0:
-			if save_translations:
-				if word in scroll:
-					scroll[word] = scroll[word] + 1
-				else:
-					scroll[word] = 1
-				render_popup(event, word)
-		elif event.state == 4:
-			font1 = (font1[0], font1[1] - 1)
-			mpv_message('font1: ' + str(font1))
-			beysc()
-			render_subtitles()
-		elif event.state == 1:
-			subs_bottom_padding -= 5
-			mpv_message('subs_bottom_padding: ' + str(subs_bottom_padding))
-			beysc()
-			render_subtitles()
-	elif event.num == 6:
+		
+	def f_scroll_translations_down(word):
+		global subs_bottom_padding, font1
+		if save_translations:
+			if word in scroll and scroll[word] > 0:
+				scroll[word] = scroll[word] - 1
+			else:
+				scroll[word] = 0
+			render_popup(event, word)
+
+	def f_scroll_translations_up(word):
+		if save_translations:
+			if word in scroll:
+				scroll[word] = scroll[word] + 1
+			else:
+				scroll[word] = 1
+			render_popup(event, word)
+		
+	def f_subs_bottom_padding_decrease(word):
+		global subs_bottom_padding
+		subs_bottom_padding -= 5
+		mpv_message('subs_bottom_padding: ' + str(subs_bottom_padding))
+		beysc()
+		render_subtitles()
+		
+	def f_subs_bottom_padding_increase(word):
+		global subs_bottom_padding
+		subs_bottom_padding += 5
+		mpv_message('subs_bottom_padding: ' + str(subs_bottom_padding))
+		beysc()
+		render_subtitles()
+	
+	def f_font_size_decrease(word):
+		global font1
+		font1 = (font1[0], font1[1] + 1)
+		mpv_message('font1: ' + str(font1))
+		beysc()
+		render_subtitles()
+	
+	def f_font_size_increase(word):
+		global font1
+		font1 = (font1[0], font1[1] - 1)
+		mpv_message('font1: ' + str(font1))
+		beysc()
+		render_subtitles()
+		
+	def f_auto_pause_min_words_decrease(word):
 		auto_pause_min_words = auto_pause_min_words - 1
 		mpv_message('auto_pause_min_words: ' + str(auto_pause_min_words))
-	elif event.num == 7:
+		
+	def f_auto_pause_min_words_increase(word):
 		auto_pause_min_words = auto_pause_min_words + 1
 		mpv_message('auto_pause_min_words: ' + str(auto_pause_min_words))
+		
+	def f_deepl_translation(word):
+		render_popup(event, word, line)
+	
+	###############################
+	
+	for ma in mouse_buttons:
+		if ma[0] == event.num and ma[1] == event.state:
+			locals()[ma[2]](word)
 
 def listen(word, type = 'gtts'):
 	if type == 'pons':
@@ -914,7 +984,13 @@ class gTTS:
 def mpv_pause(e = None):
 	os.system('echo \'{ "command": ["set_property", "pause", true] }\' | socat - "' + mpv_socket + '" > /dev/null')
 
-def mpv_resume(e = None):
+def mpv_resume(e = None, ppd = False):
+	if ppd:
+		try:
+			popup.destroy()
+		except:
+			pass
+			
 	os.system('echo \'{ "command": ["set_property", "pause", false] }\' | socat - "' + mpv_socket + '" > /dev/null')
 
 def mpv_pause_status():
