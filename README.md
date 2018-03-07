@@ -63,7 +63,7 @@ Usage
 - Press F5 to start/stop interSubs.
 - Point cursor over the word to get popup with translation.
 
-buttons bellow may be reassigned
+Buttons bellow may be reassigned in config
 -----
 - Click on the word to look it up on another translator in the browser.
 - Right-click on the word to hear its pronunciation.
