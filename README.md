@@ -1,7 +1,7 @@
 interSubs
 =========
 
-v. 1.19
+v. 1.20
 
 Interactive subtitles for `mpv`, that was made to help study languages. Easily tweaked and customizable.
 
@@ -90,3 +90,4 @@ Changelog
 - 1.19 - Added option to reassign buttons.
          Added support for deepl.com; to translate whole sentences. Supported languages: de, en, fr, es, it, nl, pl.
          Version are not back compatible with previous config.
+- 1.20 - Added function to save words to a file. Boundable to a mouse.
