@@ -90,4 +90,4 @@ Changelog
 - 1.19 - Added option to reassign buttons.
          Added support for deepl.com; to translate whole sentences. Supported languages: de, en, fr, es, it, nl, pl.
          Version are not back compatible with previous config.
-- 1.20 - Added function to save words to a file. Boundable to a mouse.
+- 1.20 - Added function to save words to a file. Boundable to a mouse-button.
