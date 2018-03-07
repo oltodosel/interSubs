@@ -1,4 +1,4 @@
-# v. 1.19
+# v. 1.20
 # Interactive subtitles for `mpv` for language learners.
 
 # BEWARE!
@@ -82,12 +82,17 @@ listen_via = 'gtts'					# gtts|pons|forvo # gtts is google-text-to-speech
 translate_whole_sentences = 1		# translate whole sentences with deepl.com
 									# mouse-button = 8
 
+# filename where to save words if needed by bound to mouse-button function f_save_word_to_file; checks if the word is already there.
+save_word_to_file_fname = '~/saved_words_by_interSubs'
 
 # reassigning mouse buttons
 # functions' names are self-explanatory
-
-# [1, 0, 'f_show_in_browser']
 # [mouse_event, modifier_key, 'self_explanatory_function_name']
+
+# to one button multiple functions can be assigned
+# by left-click this will open word in browser and save it to file.
+# [1, 0, 'f_show_in_browser']
+# [1, 0, 'f_save_word_to_file']
 
 # mouse_event:
 	# 1 == left-click
@@ -118,6 +123,7 @@ translate_whole_sentences = 1		# translate whole sentences with deepl.com
 	# f_auto_pause_min_words_decrease
 	# f_auto_pause_min_words_increase
 	# f_deepl_translation
+	# f_save_word_to_file
 	
 mouse_buttons = [
 	[1, 0, 'f_show_in_browser'],

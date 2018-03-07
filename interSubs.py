@@ -1,6 +1,6 @@
 #! /usr/bin/env python
 
-# v. 1.19
+# v. 1.20
 # Interactive subtitles for `mpv` for language learners.
 
 import os, subprocess, sys
@@ -682,6 +682,10 @@ def wheel_ev(event, word = '', line = ''):
 		
 	def f_deepl_translation(word):
 		render_popup(event, word, line)
+		
+	def f_save_word_to_file(word):
+		if word not in [ x.strip() for x in open(os.path.expanduser(save_word_to_file_fname)).readlines() ]:
+			print(word, file = open(os.path.expanduser(save_word_to_file_fname), 'a'))
 	
 	###############################
 	
