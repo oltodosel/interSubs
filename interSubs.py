@@ -1,6 +1,6 @@
 #! /usr/bin/env python
 
-# v. 1.20
+# v. 1.21
 # Interactive subtitles for `mpv` for language learners.
 
 import os, subprocess, sys
@@ -166,7 +166,7 @@ def render_popup(event, word, line = False):
 		if split_long_lines and len(subs.split('\n')) == 1 and len(subs.split(' ')) > split_long_lines_words_min - 1:
 			line = ' '.join(numpy.array_split(line.split(' '), 2)[0]) + '\n' + ' '.join(numpy.array_split(line.split(' '), 2)[1])
 		
-		Label(popup, text = line, font = font1, borderwidth = 0, padx = 0, pady = 0, background = bg_color2, foreground = font_color2, highlightthickness = 0, wraplength = wrplgth, justify = "left").pack(side = "left", anchor = "w")
+		Label(popup, text = ' ' + line, font = font1, borderwidth = 0, padx = 0, pady = 0, background = bg_color2, foreground = font_color2, highlightthickness = 0, wraplength = wrplgth, justify = "left").pack(side = "left", anchor = "w")
 	else:
 		# retrieving translations simultaneously
 		if save_translations and len(translation_function_names) > 1:
@@ -684,7 +684,7 @@ def wheel_ev(event, word = '', line = ''):
 		render_popup(event, word, line)
 		
 	def f_save_word_to_file(word):
-		if word not in [ x.strip() for x in open(os.path.expanduser(save_word_to_file_fname)).readlines() ]:
+		if ( os.path.isfile(os.path.expanduser(save_word_to_file_fname)) and word not in [ x.strip() for x in open(os.path.expanduser(save_word_to_file_fname)).readlines() ] ) or not os.path.isfile(os.path.expanduser(save_word_to_file_fname)):
 			print(word, file = open(os.path.expanduser(save_word_to_file_fname), 'a'))
 	
 	###############################
