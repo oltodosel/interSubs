@@ -1,4 +1,4 @@
-# v. 1.20
+# v. 1.22
 # Interactive subtitles for `mpv` for language learners.
 
 # BEWARE!
@@ -52,7 +52,7 @@ popup_ext_n_int_padding = 6
 
 show_in_browser = 'chromium "http://www.linguee.com/german-english/search?source=german&query=${word}"'	# firefox "https://en.wiktionary.org/wiki/${word}"
 
-translation_function_names = ['pons', 'dict_cc', 'redensarten']	# dictionaries to use, one or more.
+translation_function_names = ['dict_cc', 'pons']	# dictionaries to use, one or more.
 									# or other function's name you might write that will return ([[word, translation]..], [morphology = '', gender = ''])
 									# available:
 									# pons
@@ -60,6 +60,10 @@ translation_function_names = ['pons', 'dict_cc', 'redensarten']	# dictionaries t
 									# dict_cc
 									# mtranslate_google (one word translation - for uncommon languages)
 									# redensarten (redensarten-index.de - German idioms etc.)
+									# tab_devided_dict - offline dictionary with word \t translation
+
+tab_devided_dict_fname = '~/d/python_shit/mpv/scripts/z'		# path to the offline dictionary
+tab_devided_dict_remove_tags = 1	# strip <.*?>
 
 # for going through lines step by step
 auto_pause_min_words = 10			# skip pausing when subs are less then X words

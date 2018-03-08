@@ -1,6 +1,6 @@
 #! /usr/bin/env python
 
-# v. 1.21
+# v. 1.22
 # Interactive subtitles for `mpv` for language learners.
 
 import os, subprocess, sys
@@ -569,6 +569,15 @@ def redensarten(word):
 
 	return pairs, ['', '']
 
+# offline dictionary with word \t translation
+def tab_devided_dict(word):
+	if word in offdict:
+		tr = re.sub('<.*?>', '', offdict[word]) if tab_devided_dict_remove_tags else offdict[word]
+		tr = tr.replace('\\n', '\n').replace('\\~', '~')
+		return [[tr, '-']], ['', '']
+	else:
+		return [], ['', '']
+	
 # deepl.com
 # https://github.com/EmilioK97/pydeepl
 def deepl(text):
@@ -1043,6 +1052,9 @@ if save_translations:
 		os.mkdir('urls')
 	except:
 		pass
+
+if 'tab_devided_dict' in translation_function_names:
+	offdict = { x.split('\t')[0].strip().lower() : x.split('\t')[1].strip() for x in open(os.path.expanduser(tab_devided_dict_fname)).readlines() if '\t' in x }
 
 #exit(pons('verdient'));
 #exit(dict_cc('er'));
