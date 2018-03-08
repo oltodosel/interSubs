@@ -1,11 +1,11 @@
 interSubs
 =========
 
-v. 1.21
+v. 1.22
 
 Interactive subtitles for `mpv`, that was made to help study languages. Easily tweaked and customizable.
 
-- https://dict.cc/, https://pons.com/, http://reverso.net/, https://redensarten-index.de/ or Google for single words.
+- https://dict.cc/, https://pons.com/, http://reverso.net/, https://redensarten-index.de/, Google or \t separated offline dictionary for single words.
 - https://www.deepl.com/translator for whole sentences.
 - http://linguee.com/ redirecting to browser by click.
 - https://forvo.com/, https://pons.com/ or Google for pronouncing single words.
@@ -92,3 +92,4 @@ Changelog
          Version are not back compatible with previous config.
 - 1.20 - Added function to save words to a file. Boundable to a mouse-button.
 - 1.21 - Minor error correction.
+- 1.22 - Added \t separated offline dictionary support.
