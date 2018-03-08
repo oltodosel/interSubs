@@ -5,7 +5,8 @@ v. 1.22
 
 Interactive subtitles for `mpv`, that was made to help study languages. Easily tweaked and customizable.
 
-- https://dict.cc/, https://pons.com/, http://reverso.net/, https://redensarten-index.de/, Google or \t separated offline dictionary for single words.
+- https://dict.cc/, https://pons.com/, http://reverso.net/, https://redensarten-index.de/ or Google for single words
+- Offline \t separated dictionary. (https://github.com/ilius/pyglossary)
 - https://www.deepl.com/translator for whole sentences.
 - http://linguee.com/ redirecting to browser by click.
 - https://forvo.com/, https://pons.com/ or Google for pronouncing single words.
