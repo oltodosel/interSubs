@@ -30,10 +30,10 @@ function s1()
 	-- setting up socket to control mpv
 	mp.set_property("input-ipc-server", mpv_socket_2)
 	
-	sbv = mp.get_property("sub-visibility")
-	
 	-- without visible subs won't work
+	sbv = mp.get_property("sub-visibility")
 	mp.set_property("sub-visibility", "yes")
+	mp.set_property("sub-ass-override", "force")
 	
 	sub_color1 = mp.get_property("sub-color", "1/1/1/1")
 	sub_color2 = mp.get_property("sub-border-color", "0/0/0/1")
