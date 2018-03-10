@@ -1,4 +1,4 @@
--- v. 1.13
+-- v. 1.22
 -- Interactive subtitles for `mpv` for language learners.
 --
 -- default keybinding: F5
@@ -31,9 +31,16 @@ function s1()
 	mp.set_property("input-ipc-server", mpv_socket_2)
 	
 	sbv = mp.get_property("sub-visibility")
+	
 	-- without visible subs won't work
 	mp.set_property("sub-visibility", "yes")
-	mp.set_property_number("sub-scale", 0)
+	
+	sub_color1 = mp.get_property("sub-color", "1/1/1/1")
+	sub_color2 = mp.get_property("sub-border-color", "0/0/0/1")
+	sub_color3 = mp.get_property("sub-shadow-color", "0/0/0/1")
+	mp.set_property("sub-color", "0/0/0/0")
+	mp.set_property("sub-border-color", "0/0/0/0")
+	mp.set_property("sub-shadow-color", "0/0/0/0")
 
 	start_command_2 = start_command:format(pyname:gsub('~', os.getenv('HOME')), mpv_socket_2, sub_file_2)
 	os.execute(start_command_2 .. ' &')
@@ -53,8 +60,10 @@ function s_rm()
 	running = false
 	mp.msg.warn('Quitting interSubs ...')
 
-	mp.set_property_number("sub-scale", 1)
 	mp.set_property("sub-visibility", sbv)
+	mp.set_property("sub-color", sub_color1)
+	mp.set_property("sub-border-color", sub_color2)
+	mp.set_property("sub-shadow-color", sub_color3)
 
 	os.execute('pkill -f "' .. mpv_socket_2 .. '"')
 	os.execute('(sleep 3 && rm "' .. mpv_socket_2 .. '") &')
