@@ -1,12 +1,5 @@
 #! /usr/bin/env python
 
-# Added support for subtitles with more than 2 lines.
-# Added support for subtitles to be at the top of the screen; subs_top_placement_B = True
-# Added sulmantanious creation of buttons for words using [mtTkinter](https://github.com/RedFantom/mtTkinter).
-# Speeds up rendering 2-5x, especcialy noticable on long sentences.
-# pip install mttkinter
-# Added option to show N of previous subtitles; show_N_of_previous_subtitles = N; Might be slow without mtTkinter, especially when having script show too many previous lines.
-
 # v. 1.23
 # Interactive subtitles for `mpv` for language learners.
 

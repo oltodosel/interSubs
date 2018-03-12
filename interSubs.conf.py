@@ -36,7 +36,7 @@ R2L_from_B = False
 # translation is written right-to-left, e.g Hebrew/Arabic
 R2L_to_B = False
 
-font1 = ("Trebuchet MS", 32)		# subtitles (font, size)
+font1 = ("Trebuchet MS", 33)		# subtitles (font, size)
 font2 = ("Trebuchet MS", 27)		# [popup] original language & translation
 font3 = ("Trebuchet MS", 23)		# [popup] morphology
 font_color1 = '#BAC4D6'				# subtitles
