@@ -1,7 +1,7 @@
 interSubs
 =========
 
-v. 1.22
+v. 1.23 - Changelog at the bottom.
 
 Interactive subtitles for `mpv`, that was made to help study languages. Easily tweaked and customizable.
 
@@ -13,7 +13,7 @@ Interactive subtitles for `mpv`, that was made to help study languages. Easily t
 - Can use multiple dictionaries simultaneously. 
 -
 - Doesn't work with DVD (picture based) subtitles, only the text-based ones.
-- To convert picture based subtitles into *.srt - https://github.com/oltodosel/extract_n_convert_dvd_bd_subtitles
+- To convert picture based subtitles into *.srt; also extracts them from *.mkv [extract_n_convert_dvd_bd_subtitles](https://github.com/oltodosel/extract_n_convert_dvd_bd_subtitles)
 -
 - Can colorize nouns by gender; German only with given dictionary.
 - Works with right-to-left writing.
@@ -37,10 +37,11 @@ Interactive subtitles for `mpv`, that was made to help study languages. Easily t
 
 Requirements
 ------------
-   - mpv 0.25 (I don't know if it will work with mpv front-ends.)
+   - mpv 0.27 (I don't know if it will work with mpv front-ends.)
    - Python 3
    - numpy (pip)
    - beautifulsoup4 (pip)
+   - mttkinter (pip) (works without it, but slower)
    - Tcl/Tk 8.6.6
    - Lua
    - pkill
@@ -80,17 +81,29 @@ Important
 - By default works only in fullscreen.
 - May have issues working in a multi-monitor system.
 
-
 Changelog
 -----
-- 1.14 - Added simultaneous use of multiple dictionaries. When using more than one - scrolling is infinite.
-- 1.15 - Added multi-threaded retrieval when using more than one dictionary. Works only with `save_translations = 1`
-- 1.16 - Added waiting cursor. Minor errors correction.
-- 1.17 - Minor errors correction.
-- 1.18 - Added redensarten-index.de support (German idioms).
-- 1.19 - Added option to reassign buttons.
-         Added support for deepl.com; to translate whole sentences. Supported languages: de, en, fr, es, it, nl, pl.
-         Version are not back compatible with previous config.
-- 1.20 - Added function to save words to a file. Boundable to a mouse-button.
-- 1.21 - Minor error correction.
-- 1.22 - Added \t separated offline dictionary support.
+* 1.14 - Added simultaneous use of multiple dictionaries. When using more than one - scrolling is infinite.
+* 1.15 - Added multi-threaded retrieval when using more than one dictionary. Works only with `save_translations = 1`
+* 1.16 - Added waiting cursor. Minor errors correction.
+* 1.17 - Minor errors correction.
+* 1.18 - Added redensarten-index.de support (German idioms).
+* 1.19
+    * Added option to reassign buttons.
+    * Added support for deepl.com; to translate whole sentences.
+        * Supported languages: de, en, fr, es, it, nl, pl.
+    * Version are not back compatible with previous config.
+* 1.20 - Added function to save words to a file. Boundable to a mouse-button.
+* 1.21 - Minor error correction.
+* 1.22 - Added \t separated offline dictionary support.
+* 1.23
+    * Added support for subtitles with more than 2 lines.
+    * Added support for subtitles to be at the top of the screen.
+        * `subs_top_placement_B = True`
+    * Added simultaneous creation of buttons for words using [mtTkinter](https://github.com/RedFantom/mtTkinter).
+        * Speeds up rendering 2-5x, especially noticeable on long sentences.
+        * `pip install mttkinter`
+    * Added option to show N of previous subtitles.
+        * Might be slow without mtTkinter, especially when having script show too many previous lines.
+        * `show_N_of_previous_subtitles = N`
+		
