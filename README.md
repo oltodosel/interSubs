@@ -38,12 +38,13 @@ Interactive subtitles for `mpv`, that was made to help study languages. Easily t
 Requirements
 ------------
    - mpv 0.27 (I don't know if it will work with mpv front-ends.)
-   - Python 3
+   - python 3
    - numpy (pip)
    - beautifulsoup4 (pip)
    - mttkinter (pip) (works without it, but slower)
    - Tcl/Tk 8.6.6
-   - Lua
+   - lua
+   - socat
    - pkill
    - xdotool (for hiding subtitles when minimizing mpv or switching window) 
    - optional: chromium (for external translation, other browser can be specified)
