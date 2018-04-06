@@ -39,7 +39,7 @@ Requirements
    - mpv 0.27 (I don't know if it will work with mpv front-ends.)
    - python 3
    - pyqt5 (pip/pacman/etc)
-   - composite manager;`xcompmgr` or sth. (pacman/etc)
+   - composite manager; xcompmgr or sth.
    - numpy (pip/pacman/etc)
    - beautifulsoup4 (pip/pacman/etc)
    - lua
@@ -54,6 +54,7 @@ Installation
 ```
 mv interSubs.py interSubs.lua interSubs_config.py ~/.config/mpv/scripts/;
 # Edit configuration file interSubs_config.py
+# Edit interSubs.lua to add option where interSubs will start automatically. 
 # For Mac also edit configuration at interSubs.lua
 # For Windows - port it yourself.
 ```
