@@ -1,8 +1,8 @@
 interSubs
 =========
 
-Tk is abandoned in favor of Qt (because of transparency).  
-v. 2.0a - Changelog at the bottom.
+v. 2.0a - Changelog at the bottom.  
+If Qt version doesn't work for you - use Tk https://github.com/oltodosel/interSubs/tree/master/Tk
 
 -------
 
