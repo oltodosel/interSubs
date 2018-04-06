@@ -16,7 +16,6 @@ Easily tweaked and customizable.
 - https://forvo.com/, https://pons.com/ or Google for pronouncing single words.
 - Can use multiple dictionaries simultaneously.
 - Reassigning mouse buttons functions in config.
--
 - Doesn't work with DVD (picture based) subtitles, only the text-based ones.
 - To convert picture based subtitles into *.srt; also extracts them from *.mkv [extract_n_convert_dvd_bd_subtitles](https://github.com/oltodosel/extract_n_convert_dvd_bd_subtitles)
 - Can extend time of subs showing; for slow readers
