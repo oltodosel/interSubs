@@ -1,7 +1,7 @@
 interSubs
 =========
 
-v. 2.0a - Changelog at the bottom.  
+v. 2.1 - Changelog at the bottom.  
 If Qt version doesn't work for you - use Tk https://github.com/oltodosel/interSubs/tree/master/Tk
 
 -------
@@ -99,4 +99,6 @@ Changelog
 	* Randomization of translations was removed.
 	* Option to show N of previous subtitles is suspended for now, I might add it in the future.
 	* Tk version won't be updated unless something critical happens.
-		
+* 2.1
+	* R2L support (checked on Hebrew; works more or less).
+	* Minor corrections.
