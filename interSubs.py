@@ -1,6 +1,6 @@
 #! /usr/bin/env python
 
-# v. 2.0a
+# v. 2.1
 # Interactive subtitles for `mpv` for language learners.
 
 import os, subprocess, sys
@@ -694,23 +694,18 @@ def stripsd2(phrase):
 
 def r2l(l):
 	l2 = ''
-	# since tk doesn't support right-to-left text
-	# might botch some text
+	
 	try:
-		l2 = re.findall('(?!%)\W+$',l)[0]
+		l2 = re.findall('(?!%)\W+$', l)[0][::-1]
 	except:
 		pass
 
-	l2 += re.sub('^\W+|(?!%)\W+$','',l)
+	l2 += re.sub('^\W+|(?!%)\W+$', '', l)
 
 	try:
-		l2 += re.findall('^\W+',l)[0]
+		l2 += re.findall('^\W+', l)[0][::-1]
 	except:
 		pass
-
-	l2 = l2[::-1]
-	# reversing back l2r chunks
-	l2 = re.sub('[0-9a-zA-Z%\$-]{2,}', lambda x: x.group(0)[::-1], l2)
 
 	return l2
 
@@ -737,7 +732,7 @@ def split_long_lines(line, chunks = 2, max_symbols_per_line = False):
 #########################################
 
 class thread_subtitles(QObject):
-	update_subtitles = pyqtSignal(bool)
+	update_subtitles = pyqtSignal(bool, bool)
 
 	@pyqtSlot()
 	def main(self):
@@ -754,7 +749,7 @@ class thread_subtitles(QObject):
 			if inc * config.update_time > config.focus_checking_time - 0.0001:
 				while 'mpv' not in subprocess.getoutput('xdotool getwindowfocus getwindowname') or (config.hide_when_not_fullscreen_B and not mpv_fullscreen_status()):
 					if not was_hidden:
-						self.update_subtitles.emit(True)
+						self.update_subtitles.emit(True, False)
 						was_hidden = 1
 					else:
 						time.sleep(config.focus_checking_time)
@@ -763,7 +758,7 @@ class thread_subtitles(QObject):
 
 			if was_hidden:
 				was_hidden = 0
-				self.update_subtitles.emit(False)
+				self.update_subtitles.emit(False, False)
 				continue
 
 			try:
@@ -774,18 +769,21 @@ class thread_subtitles(QObject):
 			if config.extend_subs_duration2max_B and not len(tmp_file_subs):
 				continue
 
-			# ~# automatically switch into Hebrew if it's detected
-			# ~if config.lang_from != 'he' and any((c in set('קראטוןםפשדגכעיחלךףזסבהנמצתץ')) for c in tmp_file_subs):
-				# ~config.lang_from = 'he'
-				# ~frf = random.choice(config.he_fonts)
-				# ~config.style_subs = re.sub('font-family: ".*?";', lambda ff: 'font-family: "%s";' % frf, config.style_subs, flags = re.I)
+			# automatically switch into Hebrew if it's detected
+			if config.lang_from != 'he' and any((c in set('קראטוןםפשדגכעיחלךףזסבהנמצתץ')) for c in tmp_file_subs):
+				config.lang_from = 'he'
+				
+				frf = random.choice(config.he_fonts)
+				config.style_subs = re.sub('font-family: ".*?";', lambda ff: 'font-family: "%s";' % frf, config.style_subs, flags = re.I)
 
-				# ~config.R2L_from_B = 1
-				# ~config.translation_function_names = ['reverso']
-				# ~config.listen_via = 'forvo'
+				config.R2L_from_B = True
+				config.translation_function_names = ['reverso']
+				config.listen_via = 'forvo'
 
-				# ~os.system('notify-send -i none -t 1111 "He"')
-				# ~os.system('notify-send -i none -t 1111 "%s"' % str(frf))
+				os.system('notify-send -i none -t 1111 "He"')
+				os.system('notify-send -i none -t 1111 "%s"' % str(frf))
+				
+				self.update_subtitles.emit(False, True)
 
 			while tmp_file_subs != subs:
 				if config.auto_pause == 2:
@@ -804,7 +802,7 @@ class thread_subtitles(QObject):
 					if len(re.sub(' +', ' ', stripsd2(subs.replace('\n', ' '))).split(' ')) > config.auto_pause_min_words - 1:
 						mpv_pause()
 
-				self.update_subtitles.emit(False)
+				self.update_subtitles.emit(False, False)
 				
 				break
 
@@ -859,7 +857,10 @@ class drawing_layer(QLabel):
 		
 		font = self.font()
 		text_path = QPainterPath()
-		text_path.addText(x, y, font, text)
+		if config.R2L_from_B:
+			text_path.addText(x, y, font, ' ' + r2l(text.strip()) + ' ')
+		else:
+			text_path.addText(x, y, font, text)
 		
 		# draw blur
 		range_width = range(outline_width, outline_width + outline_blur)
@@ -945,7 +946,7 @@ class events_class(QLabel):
 	if config.outline_B:
 		def paintEvent(self, evt: QPaintEvent):
 			if self.highlight:
-				self.highligting(config.hover_color, config.hover_underline_width)
+				self.highligting(config.hover_color, config.hover_underline_thickness)
 			
 	#####################################################
 	
@@ -1157,7 +1158,6 @@ class main_class(QWidget):
 			self.subtitles.setStyleSheet(config.style_subs)
 			self.subtitles2.setStyleSheet(config.style_subs)
 		else:
-			config.z = 0
 			self.clearLayout('subs')
 			self.clearLayout('subs2')
 
@@ -1169,30 +1169,20 @@ class main_class(QWidget):
 				subs2 = split_long_lines(subs)
 			else:
 				subs2 = subs
-
-			# ~subs2 = 'Wären Typ,,, qQ fg. \n Wären Typ ch.'
-			# ~subs2 = 'Wären Typ,,, qQ fg.'
-			
+				
 			subs2 = re.sub(' +', ' ', subs2).strip()
 			
 			##############################
 
 			for line in subs2.split('\n'):
+				line2 = ' %s ' % line.strip()
+				ll = drawing_layer(line2, subs2)	
+				
 				hbox = QHBoxLayout()
 				hbox.setContentsMargins(0, 0, 0, 0)
 				hbox.setSpacing(0)
-				hbox.addStretch()
-
-				if config.R2L_from_B:
-					line2 = r2l(line.strip())
-				else:
-					line2 = line.strip()
-					
-				line2 = ' %s ' % line2
-				
-				ll = drawing_layer(line2, subs2)							
+				hbox.addStretch()		
 				hbox.addWidget(ll)
-				
 				hbox.addStretch()
 				self.subtitles_vbox.addLayout(hbox)
 				
@@ -1204,13 +1194,9 @@ class main_class(QWidget):
 				hbox.addStretch()
 
 				if config.R2L_from_B:
-					line2 = r2l(line.strip())
-				else:
-					line2 = line.strip()
-
-				line2 = ' %s ' % line2
+					line2 = line2[::-1]
+				
 				line2 += '\00'
-
 				word = ''
 				for smbl in line2:
 					if smbl.isalpha():
@@ -1302,11 +1288,11 @@ class main_class(QWidget):
 					if pair[1] == '-':
 						pair[1] = ''
 
-					if config.R2L_from_B:
-						pair[0] = pair[0][::-1]
-					if config.R2L_to_B:
-						pair[1] = pair[1][::-1]
-
+					# ~if config.R2L_from_B:
+						# ~pair[0] = pair[0][::-1]
+					# ~if config.R2L_to_B:
+						# ~pair[1] = pair[1][::-1]
+					
 					if pair[0] != '':
 						# to emphasize the exact form of the word
 						# to ignore case on input and match it on output
@@ -1341,7 +1327,6 @@ class main_class(QWidget):
 				if len(word_descr[0]):
 					ll = QLabel(word_descr[0])
 					ll.setProperty("morphology", word_descr[1])
-					ll.setObjectName("morphology")
 					ll.setAlignment(Qt.AlignRight)
 					self.popup_vbox.addWidget(ll)
 
@@ -1392,8 +1377,6 @@ if 'tab_divided_dict' in config.translation_function_names:
 if __name__ == "__main__":
 	print('[py part] Starting interSubs ...')
 
-	# ~sub_file = '/tmp/mpv_sub'
-	# ~mpv_socket = '/tmp/mpv_socket'
 	mpv_socket = sys.argv[1]
 	sub_file = sys.argv[2]
 	subs = ''
