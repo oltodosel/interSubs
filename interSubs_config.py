@@ -1,4 +1,6 @@
-# v. 2.0a
+#! /usr/bin/env python
+
+# v. 2.1
 # Interactive subtitles for `mpv` for language learners.
 
 #########################################
@@ -42,10 +44,10 @@ extend_subs_duration2max_B = True
 # show interSubs only in fullscreen
 hide_when_not_fullscreen_B = True
 
-# interval in seconds between checking for the next subtitle
+# interval between checking for the next subtitle; in seconds
 update_time = .01
-# interval in seconds between checking if mpv is in focus using `xdotool` and/or in fullscreen
-focus_checking_time = .05
+# interval in seconds between checking if mpv is in focus using `xdotool` and/or in fullscreen; in seconds
+focus_checking_time = .1
 
 # firefox "https://en.wiktionary.org/wiki/${word}"
 show_in_browser = 'chromium "http://www.linguee.com/german-english/search?source=german&query=${word}"'
@@ -75,8 +77,8 @@ R2L_to_B = False
 
 # show subtitles at the top of the screen
 subs_top_placement_B = False
-# distance to the edge
-subs_screen_edge_padding = 5
+# distance to the edge; in px
+subs_screen_edge_padding = 1
 subs_padding_between_lines = 0
 
 # when subtitle consists of only one overly long line - splitting into two
@@ -174,15 +176,16 @@ outline_color = '#000000'
 # ~ N/2.5 == size in px; here it's 2px of outline + another ~ 3px of blur
 outline_thickness = 5
 outline_blur = 7
-# increase if outline is cropped from top/bottom of some letters; in px; can take negative values
-outline_top_padding = 0
-outline_bottom_padding = 0
+# change if outline is cropped from top/bottom of some letters depending on font
+# in px; can take negative values
+outline_top_padding = -2
+outline_bottom_padding = 2
 
 # highlighting the word under cursor
 hover_color = '#F44336'
 hover_hightlight = False	# may look ugly due to only int precision of QFontMetrics
 hover_underline = True
-hover_underline_width = 5
+hover_underline_thickness = 5
 
 #########################################################
 #########################################################
@@ -191,7 +194,7 @@ hover_underline_width = 5
 #########################################################
 
 # functions' names are self-explanatory
-# ['mouse_event', 'modifier_key', 'self_explanatory_function_name']
+# ['mouse_event', 'modifier_key', 'self_explanatory_function_name'],
 
 # to one button multiple functions can be assigned
 # by left-click this will open word in browser and save it to file.
@@ -257,3 +260,6 @@ mouse_buttons = [
 
 # http://culmus.sourceforge.net/summary.html
 he_fonts = ['Miriam', 'Miriam Mono', 'Ellinia', 'Drugulin', 'David', 'Frank Ruehl', 'Shofar']
+
+# obsolete vars
+hover_underline_width = hover_underline_thickness
