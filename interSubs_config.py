@@ -1,6 +1,6 @@
 #! /usr/bin/env python
 
-# v. 2.1
+# v. 2.2
 # Interactive subtitles for `mpv` for language learners.
 
 #########################################
@@ -20,10 +20,11 @@ lang_to = 'en'
 #	pons
 #	reverso
 #	dict_cc
+#	leo
 #	mtranslate_google (one word translation - for uncommon languages)
 #	redensarten (redensarten-index.de - German idioms etc.)
 #	tab_divided_dict - simple offline dictionary with word \t translation per line
-translation_function_names = ['dict_cc', 'pons']
+translation_function_names = ['leo', 'pons']
 
 # number of translations in popup
 number_of_translations = 4
