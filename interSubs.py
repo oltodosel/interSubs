@@ -1,6 +1,6 @@
 #! /usr/bin/env python
 
-# v. 2.1
+# v. 2.2
 # Interactive subtitles for `mpv` for language learners.
 
 import os, subprocess, sys
@@ -55,7 +55,6 @@ def pons(word):
 		soup = BeautifulSoup(p, "lxml")
 		trs = soup.find_all('dl')
 
-		#for tr in trs[1:]:
 		for tr in trs:
 			try:
 				tr1 = tr.find('dt').find('div', class_="source").get_text()
@@ -317,6 +316,55 @@ def redensarten(word):
 			print('\n'+'=====/////-----'+'\n', file=open(fname, 'a'))
 			print(word_descr, file=open(fname, 'a'))
 
+	return pairs, ['', '']
+
+# leo.org
+def leo(word):
+	language = config.lang_from if config.lang_from != 'de' else config.lang_to
+	
+	url = "https://dict.leo.org/dictQuery/m-vocab/%sde/query.xml?tolerMode=nof&rmWords=off&rmSearch=on&searchLoc=0&resultOrder=basic&multiwordShowSingle=on&lang=de&search=%s" % (language, word)
+	
+	pairs = []
+	fname = 'urls/' + url.replace('/',"-")
+	try:
+		p = open(fname).read().split('=====/////-----')
+		try:
+			word_descr = p[1].strip()
+		except:
+			word_descr = ''
+
+		if len(p[0].strip()):
+			for pi in p[0].strip().split('\n\n'):
+				pi = pi.split('\n')
+				pairs.append([pi[0], pi[1]])
+	except:
+		req = requests.get(url.format(lang=language))
+
+		content = BeautifulSoup(req.text, "xml")
+		pairs = []
+		for section in content.sectionlist.findAll('section'):
+			if int(section['sctCount']):
+				for entry in section.findAll('entry'):
+					res0 = entry.find('side', attrs = {'hc' : '0'})
+					res1 = entry.find('side', attrs = {'hc' : '1'})
+					if res0 and res1:
+						line0 = re.sub('\s+', ' ', res0.repr.getText())
+						line1 = re.sub('\s+', ' ', res1.repr.getText())
+						line0 = line0.rstrip('|').strip()
+						line1 = line1.rstrip('|').strip()
+						
+						if res0.attrs['lang'] == config.lang_from:
+							pairs.append([line0, line1])
+						else:
+							pairs.append([line1, line0])
+		
+		word_descr = ''
+		# extra check against double-writing from rouge threads
+		if not os.path.isfile(fname):
+			print('\n\n'.join(e[0] + '\n' + e[1] for e in pairs), file=open(fname, 'a'))
+			print('\n'+'=====/////-----'+'\n', file=open(fname, 'a'))
+			print(word_descr, file=open(fname, 'a'))
+	
 	return pairs, ['', '']
 
 # offline dictionary with word \t translation
@@ -729,8 +777,10 @@ def split_long_lines(line, chunks = 2, max_symbols_per_line = False):
 
 		return '\n'.join(new_lines)
 
-#########################################
-
+def dir2(name):
+	print('\n'.join(dir( name )))
+	exit()
+	
 class thread_subtitles(QObject):
 	update_subtitles = pyqtSignal(bool, bool)
 
@@ -1144,7 +1194,7 @@ class main_class(QWidget):
 		outer_box.addWidget(self.popup_inner)
 
 		self.popup_vbox = QVBoxLayout(self.popup_inner)
-		self.popup_vbox.setSpacing(0)
+		self.popup_vbox.setSpacing(0)		
 
 	def render_subtitles(self, hide = False, redraw = False):
 		if hide or not len(subs):
@@ -1341,9 +1391,12 @@ class main_class(QWidget):
 		
 		w = self.popup.geometry().width()
 		h = self.popup.geometry().height()
-
+		
 		if w > config.screen_width:
 			w = config.screen_width - 20
+
+		if w < config.screen_width / 3:
+			w = config.screen_width / 3
 
 		if x_cursor_pos == -1:
 			x = (config.screen_width/2) - (w/2)
@@ -1357,32 +1410,26 @@ class main_class(QWidget):
 		else:
 			y = config.screen_height - config.subs_screen_edge_padding - self.subtitles.height - h
 
-		self.popup.setGeometry(x, y, 0, 0)
+		self.popup.setGeometry(x, y, w, 0)
 		self.popup.show()
 		
 		QApplication.restoreOverrideCursor()
 
-def dir2(name):
-	print('\n'.join(dir( name )))
-	exit()
-
-try:
-	os.mkdir('urls')
-except:
-	pass
-
-if 'tab_divided_dict' in config.translation_function_names:
-	offdict = { x.split('\t')[0].strip().lower() : x.split('\t')[1].strip() for x in open(os.path.expanduser(config.tab_divided_dict_fname)).readlines() if '\t' in x }
-
 if __name__ == "__main__":
 	print('[py part] Starting interSubs ...')
+	
+	try:
+		os.mkdir('urls')
+	except:
+		pass
+
+	if 'tab_divided_dict' in config.translation_function_names:
+		offdict = { x.split('\t')[0].strip().lower() : x.split('\t')[1].strip() for x in open(os.path.expanduser(config.tab_divided_dict_fname)).readlines() if '\t' in x }
 
 	mpv_socket = sys.argv[1]
 	sub_file = sys.argv[2]
 	subs = ''
 	
-	# making it uniform on different themes
-	# ~QApplication.setStyle("Windows")
 	app = QApplication([])
 	
 	config.avoid_resuming = False
