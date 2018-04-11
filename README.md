@@ -4,10 +4,10 @@ interSubs
 v. 2.2 - Changelog at the bottom.  
 If Qt version doesn't work for you - use Tk https://github.com/oltodosel/interSubs/tree/master/Tk
 
--------
-
 Interactive subtitles for `mpv`, that was made to help study languages.  
 Easily tweaked and customizable.
+
+![z 00_00_5 75-00_00_19 96](https://user-images.githubusercontent.com/10230453/38359595-7f56acc0-38d1-11e8-9a65-257466a44e08.gif)
 
 * Supported dictionaries:
 	* https://dict.cc/
@@ -36,8 +36,6 @@ Easily tweaked and customizable.
     00:02:28,020 --> 00:02:33,084
     waka waka
 ```
-
-![z 00_00_5 75-00_00_19 96](https://user-images.githubusercontent.com/10230453/38359595-7f56acc0-38d1-11e8-9a65-257466a44e08.gif)
 
 Requirements
 ------------
