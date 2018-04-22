@@ -15,6 +15,7 @@ If Qt version doesn't work for you - use [Tk](https://github.com/oltodosel/inter
 	* http://reverso.net/
 	* https://dict.leo.org/
 	* https://translate.google.com/
+	* http://morfix.co.il/
 	* https://redensarten-index.de/
 * Offline \t separated dictionary. [pyglossary](https://github.com/ilius/pyglossary)
 * https://www.deepl.com/translator for whole sentences.
