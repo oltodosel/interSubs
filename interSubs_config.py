@@ -1,6 +1,6 @@
 #! /usr/bin/env python
 
-# v. 2.2
+# v. 2.3
 # Interactive subtitles for `mpv` for language learners.
 
 #########################################
@@ -21,10 +21,13 @@ lang_to = 'en'
 #	reverso
 #	dict_cc
 #	leo
-#	mtranslate_google (one word translation - for uncommon languages)
+#	google
+#	morfix (he/en en/he)
 #	redensarten (redensarten-index.de - German idioms etc.)
 #	tab_divided_dict - simple offline dictionary with word \t translation per line
-translation_function_names = ['leo', 'pons']
+translation_function_names = ['dict_cc', 'pons']
+# for automatic switch to Hebrew. Skip if it isn't your language.
+translation_function_names_2 = ['google', 'morfix']
 
 # number of translations in popup
 number_of_translations = 4
@@ -42,6 +45,8 @@ tab_divided_dict_remove_tags_B = True
 pause_during_translation_B = True
 # don't hide subtitle when its time is up and keep it on screen until the next line
 extend_subs_duration2max_B = True
+# limit extension duration in seconds; N == 0: do not limit
+extend_subs_duration_limit_sec = 15
 # show interSubs only in fullscreen
 hide_when_not_fullscreen_B = True
 
