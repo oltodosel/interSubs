@@ -4,7 +4,7 @@ interSubs
 Interactive subtitles for [mpv](https://github.com/mpv-player/mpv), that was made to help study languages.  
 Easily tweaked and customizable.
 
-v. 2.2 - Changelog at the bottom.  
+v. 2.3 - Changelog at the bottom.  
 If Qt version doesn't work for you - use [Tk](https://github.com/oltodosel/interSubs/tree/master/Tk). It is abandoned, but still works.
 
 ![z 00_00_5 75-00_00_19 96](https://user-images.githubusercontent.com/10230453/38359595-7f56acc0-38d1-11e8-9a65-257466a44e08.gif)
@@ -108,3 +108,13 @@ Changelog
 * 2.2
 	* Added https://dict.leo.org/ - de<>en/es/fr/it/pl/pt/ru/zh(cn)
 	* Minor corrections.
+
+* 2.3
+	* Added option to limit extension of subtitles during long scenes without talking.
+		* `extend_subs_duration_limit_sec = 15`
+	* Updated https://translate.google.com/
+		* Now it gives complete output instead of single result.
+		* `mtranslate_google` -> `google`
+	* Added http://www.morfix.co.il/
+		* `morfix`
+	* Minor error corrections.
