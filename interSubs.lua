@@ -1,16 +1,16 @@
--- v. 2.0a
+-- v. 2.4
 -- Interactive subtitles for `mpv` for language learners.
 --
 -- default keybinding: F5
 -- if interSubs start automatically - mpv won't show notification
 --
 -- dirs in which interSubs will start automatically; part of path/filename will also work; case insensitive; regexp
-autostart_in = {'/med/doc', 'German', ' ger ', '%.ger%.', 'Deutsch', 'Hebrew'}
+autostart_in = {'German', ' ger ', '%.ger%.', 'Deutsch', 'Hebrew'}
 
 -- for Mac change python3 to python or pythonw
 start_command = 'python3 "%s" "%s" "%s"'
 
--- recomend to have sub_file in tmpfs, or at least ssd.
+-- recomend to have these in tmpfs, or at least ssd.
 sub_file = '/tmp/mpv_sub'
 mpv_socket = '/tmp/mpv_socket'
 
@@ -71,12 +71,16 @@ function s_rm()
 	mp.set_property("sub-border-color", sub_color2)
 	--~ mp.set_property("sub-shadow-color", sub_color3)
 
-	os.execute('pkill -f "' .. mpv_socket_2 .. '"')
+	os.execute('pkill -f "' .. mpv_socket_2 .. '" &')
 	os.execute('(sleep 3 && rm "' .. mpv_socket_2 .. '") &')
 	os.execute('(sleep 3 && rm "' .. sub_file_2 .. '") &')
 end
 
 function started()
+	if mp.get_property("sub") == 'no' then
+		return true
+	end
+
 	for kk, pp in pairs(autostart_in) do
 		if mp.get_property("path"):lower():find(pp:lower()) or mp.get_property("working-directory"):lower():find(pp:lower()) then
 			s1()
@@ -88,12 +92,16 @@ end
 function s1_1()
 	if running == true then
 		s_rm()
-		mp.command('show-text "Quitting interSubs ..."')
+		mp.command('show-text "Quitting interSubs..."')
 	else
-		s1()
-		mp.command('show-text "Starting interSubs ..."')
+		if mp.get_property("sub") == 'no' then
+			mp.command('show-text "Select subtitles before starting interSubs."')
+		else
+			s1()
+			mp.command('show-text "Starting interSubs..."')
+		end
 	end
 end
 
 mp.add_forced_key_binding(keybinding, "start-stop-interSubs", s1_1)
-mp.register_event("start-file", started)
+mp.register_event("file-loaded", started)

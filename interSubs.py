@@ -1,6 +1,6 @@
 #! /usr/bin/env python
 
-# v. 2.3
+# v. 2.4
 # Interactive subtitles for `mpv` for language learners.
 
 import os, subprocess, sys
@@ -39,7 +39,7 @@ def pons(word):
 		url = 'http://en.pons.com/translate?q=%s&l=%s%s&in=%s' % (quote(word), config.lang_to, config.lang_from, config.lang_from)
 
 	pairs = []
-	fname = 'urls/' + url.replace('/',"-")
+	fname = 'urls/' + url.replace('/', "-")
 	try:
 		p = open(fname).read().split('=====/////-----')
 		try:
@@ -79,7 +79,7 @@ def pons(word):
 				break
 
 		try:
-			word_descr = soup.find_all('h2', class_ = '')
+			word_descr = soup.find_all('h2', class_='')
 			if '<i class="icon-bolt">' not in str(word_descr[0]):
 				word_descr = re.sub('\n|\r|\t', ' ', word_descr[0].get_text())
 				word_descr = re.sub(' +', ' ', word_descr).replace('&lt;', '<').replace('&gt;', '>').replace(' · ', '·').replace(' , ', ', ').strip()
@@ -285,7 +285,7 @@ def google(word):
 	url = 'https://translate.google.com/translate_a/single?client=t&sl={lang_from}&tl={lang_to}&hl={lang_to}&dt=at&dt=bd&dt=ex&dt=ld&dt=md&dt=qca&dt=rw&dt=rm&dt=ss&dt=t&ie=UTF-8&oe=UTF-8&otf=1&pc=1&ssel=3&tsel=3&kc=2&q={word}'.format(lang_from = config.lang_from, lang_to = config.lang_to, word = quote(word))
 
 	pairs = []
-	fname = 'urls/' + url.replace('/',"-")
+	fname = 'urls/' + url.replace('/', "-")
 	try:
 		p = open(fname).read().split('=====/////-----')
 		try:
@@ -345,7 +345,7 @@ def reverso(word):
 	url = 'http://context.reverso.net/translation/%s-%s/%s' % (reverso_combos[config.lang_from].lower(), reverso_combos[config.lang_to].lower(), quote(word))
 
 	pairs = []
-	fname = 'urls/' + url.replace('/',"-")
+	fname = 'urls/' + url.replace('/', "-")
 	try:
 		p = open(fname).read().split('=====/////-----')
 
@@ -383,7 +383,7 @@ def linguee(word):
 	url = 'https://www.linguee.com/german-english/search?source=german&query=%s' % quote(word)
 
 	pairs = []
-	fname = 'urls/' + url.replace('/',"-")
+	fname = 'urls/' + url.replace('/', "-")
 	try:
 		p = open(fname).read().split('=====/////-----')
 		try:
@@ -422,7 +422,7 @@ def dict_cc(word):
 	url = 'https://%s-%s.dict.cc/?s=%s' % (config.lang_from, config.lang_to, quote(word))
 
 	pairs = []
-	fname = 'urls/' + url.replace('/',"-")
+	fname = 'urls/' + url.replace('/', "-")
 	try:
 		p = open(fname).read().split('=====/////-----')
 		try:
@@ -468,7 +468,7 @@ def redensarten(word):
 	url = 'https://www.redensarten-index.de/suche.php?suchbegriff=' + quote(word) + '&bool=relevanz&gawoe=an&suchspalte%5B%5D=rart_ou&suchspalte%5B%5D=rart_varianten_ou&suchspalte%5B%5D=erl_ou&suchspalte%5B%5D=erg_ou'
 
 	pairs = []
-	fname = 'urls/' + url.replace('/',"-")
+	fname = 'urls/' + url.replace('/', "-")
 	try:
 		p = open(fname).read().split('=====/////-----')
 		try:
@@ -516,9 +516,9 @@ def leo(word):
 	language = config.lang_from if config.lang_from != 'de' else config.lang_to
 	
 	url = "https://dict.leo.org/dictQuery/m-vocab/%sde/query.xml?tolerMode=nof&rmWords=off&rmSearch=on&searchLoc=0&resultOrder=basic&multiwordShowSingle=on&lang=de&search=%s" % (language, word)
-	
+
 	pairs = []
-	fname = 'urls/' + url.replace('/',"-")
+	fname = 'urls/' + url.replace('/', "-")
 	try:
 		p = open(fname).read().split('=====/////-----')
 		try:
@@ -575,7 +575,7 @@ def morfix(word):
 	url = "http://www.morfix.co.il/en/%s" % quote(word)
 	
 	pairs = []
-	fname = 'urls/' + url.replace('/',"-")
+	fname = 'urls/' + url.replace('/', "-")
 	try:
 		p = open(fname).read().split('=====/////-----')
 		try:
@@ -634,18 +634,15 @@ def deepl(text):
 				}
 			],
 			'lang': {
-				'user_preferred_langs': [
-					l1,
-					l2
-				],
+				
 				'source_lang_user_selected': l1,
 				'target_lang': l2
-			},
-		},
+			}
+		}
 	}
 
-	response = requests.post('https://www.deepl.com/jsonrpc', json=parameters).json()
-
+	response = requests.post('https://www2.deepl.com/jsonrpc', json=parameters).json()
+	print(response)
 	if 'result' not in response:
 		return 'DeepL call resulted in a unknown result.'
 
@@ -1664,7 +1661,8 @@ class main_class(QWidget):
 		self.popup.show()
 		
 		QApplication.restoreOverrideCursor()
-
+print(deepl('am firmament'))
+exit()
 if __name__ == "__main__":
 	print('[py part] Starting interSubs ...')
 	
