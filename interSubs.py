@@ -1661,8 +1661,7 @@ class main_class(QWidget):
 		self.popup.show()
 		
 		QApplication.restoreOverrideCursor()
-print(deepl('am firmament'))
-exit()
+
 if __name__ == "__main__":
 	print('[py part] Starting interSubs ...')
 	
