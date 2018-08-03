@@ -4,7 +4,7 @@ interSubs
 Interactive subtitles for [mpv](https://github.com/mpv-player/mpv), that was made to help study languages.  
 Easily tweaked and customizable.
 
-v. 2.4 - Changelog at the bottom.  
+v. 2.5 - Changelog at the bottom.  
 If Qt version doesn't work for you - use [Tk](https://github.com/oltodosel/interSubs/tree/master/Tk). It is abandoned, but still works.
 
 ![z 00_00_5 75-00_00_19 96](https://user-images.githubusercontent.com/10230453/38359595-7f56acc0-38d1-11e8-9a65-257466a44e08.gif)
@@ -65,9 +65,10 @@ Installation
 Usage
 -----
 * Start video with mpv & select subtitles.
-* Press F5 to start/stop interSubs.
+* F5 to start/stop interSubs.
 	* Starts automatically with files/paths specified in interSubs.lua
 * Point cursor over the word to get popup with translation.
+* F6 to hide/show without exiting.
 
 Buttons bellow may be reassigned in config
 -----
@@ -121,5 +122,8 @@ Changelog
 	* Minor error corrections.
 * 2.4
 	* Fixed non-working deepl.com
+	* Minor corrections.
+* 2.5
+	* Added option to hide/show interSubs without exiting - F6
 	* Minor corrections.
 	
