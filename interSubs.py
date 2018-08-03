@@ -1,6 +1,6 @@
 #! /usr/bin/env python
 
-# v. 2.4
+# v. 2.5
 # Interactive subtitles for `mpv` for language learners.
 
 import os, subprocess, sys
@@ -10,7 +10,6 @@ import threading, queue
 import calendar, math, base64
 import numpy
 import ast
-from pprint import pprint
 
 from bs4 import BeautifulSoup
 
@@ -1033,7 +1032,7 @@ class thread_subtitles(QObject):
 
 			# hide subs when mpv isn't in focus or in fullscreen
 			if inc * config.update_time > config.focus_checking_time - 0.0001:
-				while 'mpv' not in subprocess.getoutput('xdotool getwindowfocus getwindowname') or (config.hide_when_not_fullscreen_B and not mpv_fullscreen_status()):
+				while 'mpv' not in subprocess.getoutput('xdotool getwindowfocus getwindowname') or (config.hide_when_not_fullscreen_B and not mpv_fullscreen_status()) or (os.path.exists(mpv_socket + '_hide')):
 					if not was_hidden:
 						self.update_subtitles.emit(True, False)
 						was_hidden = 1
@@ -1642,8 +1641,9 @@ class main_class(QWidget):
 		if w > config.screen_width:
 			w = config.screen_width - 20
 
-		if w < config.screen_width / 3:
-			w = config.screen_width / 3
+		if not is_line:
+			if w < config.screen_width / 3:
+				w = config.screen_width / 3
 
 		if x_cursor_pos == -1:
 			x = (config.screen_width/2) - (w/2)

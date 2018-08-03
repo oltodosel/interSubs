@@ -1,11 +1,13 @@
--- v. 2.4
+-- v. 2.5
 -- Interactive subtitles for `mpv` for language learners.
 --
--- default keybinding: F5
+-- default keybinding to start/stop: F5
+-- default keybinding to hide/show: F6
 -- if interSubs start automatically - mpv won't show notification
 --
 -- dirs in which interSubs will start automatically; part of path/filename will also work; case insensitive; regexp
-autostart_in = {'German', ' ger ', '%.ger%.', 'Deutsch', 'Hebrew'}
+-- autostart_in = {'German', ' ger ', '%.ger%.', 'Deutsch', 'Hebrew'}
+autostart_in = {'Hebrew'}
 
 -- for Mac change python3 to python or pythonw
 start_command = 'python3 "%s" "%s" "%s"'
@@ -15,6 +17,7 @@ sub_file = '/tmp/mpv_sub'
 mpv_socket = '/tmp/mpv_socket'
 
 keybinding = 'F5'
+keybinding_hide = 'F6'
 
 pyname = '~/.config/mpv/scripts/interSubs.py'
 
@@ -103,5 +106,20 @@ function s1_1()
 	end
 end
 
+function hide_show()
+	if running == true then
+		if hidden == true then
+			os.execute('rm "' .. mpv_socket_2 .. '_hide" &')
+			mp.osd_message("Showing interSubs.", .8)
+			hidden = false
+		else
+			os.execute('touch "' .. mpv_socket_2 .. '_hide" &')
+			mp.osd_message("Hiding interSubs.", .8)
+			hidden = true
+		end
+	end
+end
+
 mp.add_forced_key_binding(keybinding, "start-stop-interSubs", s1_1)
+mp.add_forced_key_binding(keybinding_hide, "hide-show-interSubs", hide_show)
 mp.register_event("file-loaded", started)
