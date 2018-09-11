@@ -46,6 +46,7 @@ Requirements
    * composite manager; xcompmgr or sth.
    * numpy (pip/pacman/etc)
    * beautifulsoup4 (pip/pacman/etc)
+   * requests (pip/pacman/etc)
    * lua
    * socat
    * pkill
