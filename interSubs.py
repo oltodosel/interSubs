@@ -1,6 +1,6 @@
 #! /usr/bin/env python
 
-# v. 2.5
+# v. 2.6
 # Interactive subtitles for `mpv` for language learners.
 
 import os, subprocess, sys
@@ -1677,7 +1677,7 @@ if __name__ == "__main__":
 	sub_file = sys.argv[2]
 	subs = ''
 	
-	app = QApplication([])
+	app = QApplication(sys.argv)
 	
 	config.avoid_resuming = False
 	config.block_popup = False
