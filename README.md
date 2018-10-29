@@ -85,6 +85,8 @@ Buttons bellow may be reassigned in config
 Important
 -----
 * May have issues working in a multi-monitor system.
+* On KDE subtitles might sometimes be invisible. See [the solution](https://github.com/oltodosel/interSubs/issues/12#issuecomment-433960146).
+* Stuttering video during subtitles change might be solved by changing mpv's video output `mpv --vo gpu`.
 
 Changelog
 -----
