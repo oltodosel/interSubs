@@ -132,4 +132,4 @@ Changelog
 * 2.6
 	* Fixed inability to start after update to pyqt5 5.11.3 or sth in that area. Didn't look for version that causes it specifically.
 * 2.7
-	* Fixed residual flickering of previous lines during subtitles change.
+	* Fixed residual flickering of previous lines during subtitles change. Began to happen at qt5.12 or so.
