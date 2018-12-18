@@ -1,6 +1,6 @@
 #! /usr/bin/env python
 
-# v. 2.3
+# v. 2.7
 # Interactive subtitles for `mpv` for language learners.
 
 #########################################
@@ -46,7 +46,7 @@ pause_during_translation_B = True
 # don't hide subtitle when its time is up and keep it on screen until the next line
 extend_subs_duration2max_B = True
 # limit extension duration in seconds; N == 0: do not limit
-extend_subs_duration_limit_sec = 15
+extend_subs_duration_limit_sec = 33
 # show interSubs only in fullscreen
 hide_when_not_fullscreen_B = True
 
@@ -121,6 +121,10 @@ font-weight: bold;
 font-size: 33px;
 
 font: bold italic large "Times New Roman" 34px;
+
+		font-family: "FiraGO";
+		font-family: "Trebuchet MS";
+		font-family: "American Typewriter";
 '''
 
 # CSS styles for subtitles
@@ -129,10 +133,11 @@ style_subs = '''
 	QFrame {
 		background: transparent;
 		color: white;
+		color: #FFF0CD;
 
-		font-family: "Trebuchet MS";
-		font-weight: bold;
-		font-size: 43px;
+		font-family: "American Typewriter";
+		/* font-weight: bold; */
+		font-size: 44px;
 	}
 '''
 
@@ -246,10 +251,10 @@ hover_underline_thickness = 5
 
 mouse_buttons = [
 	['LeftButton',		'NoModifier',		'f_show_in_browser'],
-	['RightButton',		'NoModifier',		'f_listen'],
+	['RightButton',		'NoModifier',		'f_deepl_translation'],
 	['MiddleButton',	'NoModifier',		'f_auto_pause_options'],
 
-	['BackButton',		'NoModifier',		'f_deepl_translation'],
+	['BackButton',		'NoModifier',		'f_listen'],
 
 	['ScrollDown',		'NoModifier',		'f_scroll_translations_down'],
 	['ScrollUp',		'NoModifier',		'f_scroll_translations_up'],
@@ -265,7 +270,7 @@ mouse_buttons = [
 ]
 
 # http://culmus.sourceforge.net/summary.html
-he_fonts = ['Miriam', 'Miriam Mono', 'Ellinia', 'Drugulin', 'David', 'Frank Ruehl', 'Shofar']
+he_fonts = ['Miriam', 'Miriam Mono', 'Drugulin', 'David', 'Frank Ruehl', 'Shofar', 'Varela Round', 'FiraGO']
 
 # obsolete vars
 hover_underline_width = hover_underline_thickness

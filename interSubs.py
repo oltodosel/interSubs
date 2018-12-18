@@ -1,6 +1,6 @@
 #! /usr/bin/env python
 
-# v. 2.6
+# v. 2.7
 # Interactive subtitles for `mpv` for language learners.
 
 import os, subprocess, sys
@@ -62,13 +62,13 @@ def pons(word):
 				tr1 = re.sub('\n|\r|\t', ' ', tr1)
 				tr1 = re.sub(' +', ' ', tr1).strip()
 				if not len(tr1):
-					tr1 = '-' 
+					tr1 = '-'
 
 				tr2 = tr.find('dd').find('div', class_="target").get_text()
 				tr2 = re.sub('\n|\r|\t', ' ', tr2)
 				tr2 = re.sub(' +', ' ', tr2).strip()
 				if not len(tr2):
-					tr2 = '-' 
+					tr2 = '-'
 			except:
 				continue
 
@@ -138,7 +138,7 @@ class TokenAcquirer(object):
 		"""python port for '>>>'(right shift with padding)
 		"""
 		return (val % 0x100000000) >> n
-	
+
 	RE_TKK = re.compile(r'TKK=eval\(\'\(\(function\(\)\{(.+?)\}\)\(\)\)\'\);',
 						re.DOTALL)
 
@@ -298,16 +298,16 @@ def google(word):
 	except:
 		acquirer = TokenAcquirer()
 		tk = acquirer.do(word)
-		
+
 		url = '{url}&tk={tk}'.format(url = url, tk = tk)
 		p = requests.get(url, headers={'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.167 Safari/537.36'}).text
 		p = loads(p)
-		
+
 		try:
 			pairs.append([p[0][0][0], p[0][0][1]])
 		except:
 			pass
-		
+
 		if p[1] != None:
 			for translations in p[1]:
 				for translation in translations[2]:
@@ -315,16 +315,16 @@ def google(word):
 						t1 = translation[5] + ' ' + translation[0]
 					except:
 						t1 = translation[0]
-						
+
 					t2 = ', '.join(translation[1])
-					
+
 					if not len(t1):
-						t1 = '-' 
+						t1 = '-'
 					if not len(t2):
-						t2 = '-' 
-						
+						t2 = '-'
+
 					pairs.append([t1, t2])
-		
+
 		word_descr = ''
 		# extra check against double-writing from rouge threads
 		if not os.path.isfile(fname):
@@ -513,7 +513,7 @@ def redensarten(word):
 # leo.org
 def leo(word):
 	language = config.lang_from if config.lang_from != 'de' else config.lang_to
-	
+
 	url = "https://dict.leo.org/dictQuery/m-vocab/%sde/query.xml?tolerMode=nof&rmWords=off&rmSearch=on&searchLoc=0&resultOrder=basic&multiwordShowSingle=on&lang=de&search=%s" % (language, word)
 
 	pairs = []
@@ -544,19 +544,19 @@ def leo(word):
 						line1 = re.sub('\s+', ' ', res1.repr.getText())
 						line0 = line0.rstrip('|').strip()
 						line1 = line1.rstrip('|').strip()
-						
+
 						if res0.attrs['lang'] == config.lang_from:
 							pairs.append([line0, line1])
 						else:
 							pairs.append([line1, line0])
-		
+
 		word_descr = ''
 		# extra check against double-writing from rouge threads
 		if not os.path.isfile(fname):
 			print('\n\n'.join(e[0] + '\n' + e[1] for e in pairs), file=open(fname, 'a'))
 			print('\n'+'=====/////-----'+'\n', file=open(fname, 'a'))
 			print(word_descr, file=open(fname, 'a'))
-	
+
 	return pairs, ['', '']
 
 # offline dictionary with word \t translation
@@ -570,9 +570,9 @@ def tab_divided_dict(word):
 
 # morfix.co.il
 def morfix(word):
-	
+
 	url = "http://www.morfix.co.il/en/%s" % quote(word)
-	
+
 	pairs = []
 	fname = 'urls/' + url.replace('/', "-")
 	try:
@@ -595,22 +595,22 @@ def morfix(word):
 		for div in divs:
 			he = div.find('div', class_ = re.compile('translation_he'))
 			he = re.sub('\s+', ' ', he.get_text()).strip()
-			
+
 			en = div.find('div', class_ = re.compile('translation_en'))
 			en = re.sub('\s+', ' ', en.get_text()).strip()
-			
+
 			if config.lang_from == 'he':
 				pairs.append([he, en])
 			else:
 				pairs.append([en, he])
-		
+
 		word_descr = ''
 		# extra check against double-writing from rouge threads
 		if not os.path.isfile(fname):
 			print('\n\n'.join(e[0] + '\n' + e[1] for e in pairs), file=open(fname, 'a'))
 			print('\n'+'=====/////-----'+'\n', file=open(fname, 'a'))
 			print(word_descr, file=open(fname, 'a'))
-	
+
 	return pairs, ['', '']
 
 # deepl.com
@@ -633,7 +633,7 @@ def deepl(text):
 				}
 			],
 			'lang': {
-				
+
 				'source_lang_user_selected': l1,
 				'target_lang': l2
 			}
@@ -976,7 +976,7 @@ def stripsd2(phrase):
 
 def r2l(l):
 	l2 = ''
-	
+
 	try:
 		l2 = re.findall('(?!%)\W+$', l)[0][::-1]
 	except:
@@ -1014,7 +1014,7 @@ def split_long_lines(line, chunks = 2, max_symbols_per_line = False):
 def dir2(name):
 	print('\n'.join(dir( name )))
 	exit()
-	
+
 class thread_subtitles(QObject):
 	update_subtitles = pyqtSignal(bool, bool)
 
@@ -1056,13 +1056,13 @@ class thread_subtitles(QObject):
 					continue
 				if config.extend_subs_duration_limit_sec > time.time() - last_updated:
 					continue
-				
+
 			last_updated = time.time()
 
 			# automatically switch into Hebrew if it's detected
 			if config.lang_from != 'he' and config.lang_from != 'iw' and any((c in set('קראטוןםפשדגכעיחלךףזסבהנמצתץ')) for c in tmp_file_subs):
 				config.lang_from = 'he'
-				
+
 				frf = random.choice(config.he_fonts)
 				config.style_subs = re.sub('font-family: ".*?";', lambda ff: 'font-family: "%s";' % frf, config.style_subs, flags = re.I)
 
@@ -1072,7 +1072,7 @@ class thread_subtitles(QObject):
 
 				os.system('notify-send -i none -t 1111 "He"')
 				os.system('notify-send -i none -t 1111 "%s"' % str(frf))
-				
+
 				self.update_subtitles.emit(False, True)
 
 			while tmp_file_subs != subs:
@@ -1093,7 +1093,7 @@ class thread_subtitles(QObject):
 						mpv_pause()
 
 				self.update_subtitles.emit(False, False)
-				
+
 				break
 
 class thread_translations(QObject):
@@ -1125,76 +1125,96 @@ class thread_translations(QObject):
 				time.sleep(config.update_time)
 
 			QApplication.restoreOverrideCursor()
-			
+
 			if to_new_word:
 				continue
-				
+
 			if config.block_popup:
 				continue
-				
+
 			self.get_translations.emit(word, globalX, False)
 
 # drawing layer
 # because can't calculate outline with precision
 class drawing_layer(QLabel):
 	def __init__(self, line, subs, parent=None):
-		super().__init__(line)
+		super().__init__(None)
 		self.line = line
-		self.subs = subs
+		self.setStyleSheet(config.style_subs)
+		self.psuedo_line = 0
 
 	def draw_text_n_outline(self, painter: QPainter, x, y, outline_width, outline_blur, text):
 		outline_color = QColor(config.outline_color)
-		
+
 		font = self.font()
 		text_path = QPainterPath()
 		if config.R2L_from_B:
 			text_path.addText(x, y, font, ' ' + r2l(text.strip()) + ' ')
 		else:
 			text_path.addText(x, y, font, text)
-		
+
 		# draw blur
 		range_width = range(outline_width, outline_width + outline_blur)
 		# ~range_width = range(outline_width + outline_blur, outline_width, -1)
-		
+
 		for width in range_width:
 			if width == min(range_width):
 				alpha = 200
 			else:
 				alpha = (max(range_width) - width) / max(range_width) * 200
-				
+
 			blur_color = QColor(outline_color.red(), outline_color.green(), outline_color.blue(), alpha)
-			blur_brush = QBrush(blur_color, Qt.SolidPattern)		
+			blur_brush = QBrush(blur_color, Qt.SolidPattern)
 			blur_pen = QPen(blur_brush, width, Qt.SolidLine, Qt.RoundCap, Qt.RoundJoin)
-			
+
 			painter.setPen(blur_pen)
 			painter.drawPath(text_path)
-		
+
 		# draw outline
 		outline_color = QColor(outline_color.red(), outline_color.green(), outline_color.blue(), 255)
-		outline_brush = QBrush(outline_color, Qt.SolidPattern)	
+		outline_brush = QBrush(outline_color, Qt.SolidPattern)
 		outline_pen = QPen(outline_brush, outline_width, Qt.SolidLine, Qt.RoundCap, Qt.RoundJoin)
-		
+
 		painter.setPen(outline_pen)
 		painter.drawPath(text_path)
-		
+
 		# draw text
 		color = self.palette().color(QPalette.Text)
 		painter.setPen(color)
 		painter.drawText(x, y, text)
-	
+
 	if config.outline_B:
 		def paintEvent(self, evt: QPaintEvent):
+			if not self.psuedo_line:
+				self.psuedo_line = 1
+				return
+
 			x = y = 0
 			y += self.fontMetrics().ascent()
 			painter = QPainter(self)
-			
-			self.draw_text_n_outline(painter, x, y + config.outline_top_padding - config.outline_bottom_padding, config.outline_thickness, config.outline_blur, text = self.line)
 
-		def resizeEvent(self, event):
-			text_height = self.fontMetrics().height()
-			text_width = self.fontMetrics().width(self.line)
-			
-			self.setFixedSize(text_width, text_height + config.outline_bottom_padding + config.outline_top_padding)
+			self.draw_text_n_outline(
+				painter,
+				x,
+				y + config.outline_top_padding - config.outline_bottom_padding,
+				config.outline_thickness,
+				config.outline_blur,
+				text = self.line
+				)
+
+		def resizeEvent(self, *args):
+			self.setFixedSize(
+				self.fontMetrics().width(self.line),
+				self.fontMetrics().height() +
+					config.outline_bottom_padding +
+					config.outline_top_padding
+				)
+
+		def sizeHint(self):
+			return QSize(
+				self.fontMetrics().width(self.line),
+				self.fontMetrics().height()
+				)
 
 class events_class(QLabel):
 	mouseHover = pyqtSignal(str, int, bool)
@@ -1207,46 +1227,46 @@ class events_class(QLabel):
 		self.subs = subs
 		self.skip = skip
 		self.highlight = False
-		
+
 		self.setStyleSheet('background: transparent; color: transparent;')
-		
+
 	def highligting(self, color, underline_width):
 		color = QColor(color)
 		color = QColor(color.red(), color.green(), color.blue(), 200)
 		painter = QPainter(self)
-		
+
 		if config.hover_underline:
 			font_metrics = QFontMetrics(self.font())
 			text_width = font_metrics.width(self.word)
 			text_height = font_metrics.height()
-				
-			brush = QBrush(color)		
+
+			brush = QBrush(color)
 			pen = QPen(brush, underline_width, Qt.SolidLine, Qt.RoundCap)
 			painter.setPen(pen)
 			if not self.skip:
 				painter.drawLine(0, text_height - underline_width, text_width, text_height - underline_width)
-			
+
 		if config.hover_hightlight:
 			x = y = 0
 			y += self.fontMetrics().ascent()
-			
+
 			painter.setPen(color)
 			painter.drawText(x, y + config.outline_top_padding - config.outline_bottom_padding, self.word)
-	
+
 	if config.outline_B:
 		def paintEvent(self, evt: QPaintEvent):
 			if self.highlight:
 				self.highligting(config.hover_color, config.hover_underline_thickness)
-			
+
 	#####################################################
-	
+
 	def resizeEvent(self, event):
 		text_height = self.fontMetrics().height()
 		text_width = self.fontMetrics().width(self.word)
-		
+
 		self.setFixedSize(text_width, text_height + config.outline_bottom_padding + config.outline_top_padding)
 
-	def enterEvent(self, event):		
+	def enterEvent(self, event):
 		if not self.skip:
 			self.highlight = True
 			self.repaint()
@@ -1257,7 +1277,7 @@ class events_class(QLabel):
 		if not self.skip:
 			self.highlight = False
 			self.repaint()
-			
+
 			config.scroll = {}
 			self.mouseHover.emit('', 0, False)
 			QApplication.restoreOverrideCursor()
@@ -1354,7 +1374,7 @@ class events_class(QLabel):
 		else:
 			config.scroll[self.word] = 1
 		self.mouseHover.emit(self.word, event.globalX(), False)
-	
+
 class main_class(QWidget):
 	def __init__(self):
 		super().__init__()
@@ -1384,7 +1404,7 @@ class main_class(QWidget):
 			self.subtitles.hide()
 		elif layout == 'subs2':
 			layout = self.subtitles_vbox2
-			self.popup.hide()
+			self.subtitles2.hide()
 		elif layout == 'popup':
 			layout = self.popup_vbox
 			self.popup.hide()
@@ -1408,7 +1428,7 @@ class main_class(QWidget):
 		self.subtitles_vbox = QVBoxLayout(self.subtitles)
 		self.subtitles_vbox.setSpacing(config.subs_padding_between_lines)
 		self.subtitles_vbox.setContentsMargins(0, 0, 0, 0)
-		
+
 	def subtitles_base2(self):
 		self.subtitles2 = QFrame()
 		self.subtitles2.setAttribute(Qt.WA_TranslucentBackground)
@@ -1434,7 +1454,7 @@ class main_class(QWidget):
 		outer_box.addWidget(self.popup_inner)
 
 		self.popup_vbox = QVBoxLayout(self.popup_inner)
-		self.popup_vbox.setSpacing(0)		
+		self.popup_vbox.setSpacing(0)
 
 	def render_subtitles(self, hide = False, redraw = False):
 		if hide or not len(subs):
@@ -1459,25 +1479,25 @@ class main_class(QWidget):
 				subs2 = split_long_lines(subs)
 			else:
 				subs2 = subs
-				
+
 			subs2 = re.sub(' +', ' ', subs2).strip()
-			
+
 			##############################
 
 			for line in subs2.split('\n'):
 				line2 = ' %s ' % line.strip()
-				ll = drawing_layer(line2, subs2)	
-				
+				ll = drawing_layer(line2, subs2)
+
 				hbox = QHBoxLayout()
 				hbox.setContentsMargins(0, 0, 0, 0)
 				hbox.setSpacing(0)
-				hbox.addStretch()		
+				hbox.addStretch()
 				hbox.addWidget(ll)
 				hbox.addStretch()
 				self.subtitles_vbox.addLayout(hbox)
-				
+
 				####################################
-				
+
 				hbox = QHBoxLayout()
 				hbox.setContentsMargins(0, 0, 0, 0)
 				hbox.setSpacing(0)
@@ -1485,7 +1505,7 @@ class main_class(QWidget):
 
 				if config.R2L_from_B:
 					line2 = line2[::-1]
-				
+
 				line2 += '\00'
 				word = ''
 				for smbl in line2:
@@ -1515,7 +1535,7 @@ class main_class(QWidget):
 
 		w = self.subtitles.geometry().width()
 		h = self.subtitles.height = self.subtitles.geometry().height()
-		
+
 		x = (config.screen_width/2) - (w/2)
 
 		if config.subs_top_placement_B:
@@ -1525,7 +1545,7 @@ class main_class(QWidget):
 
 		self.subtitles.setGeometry(x, y, 0, 0)
 		self.subtitles.show()
-		
+
 		self.subtitles2.setGeometry(x, y, 0, 0)
 		self.subtitles2.show()
 
@@ -1551,7 +1571,7 @@ class main_class(QWidget):
 
 			for translation_function_name_i, translation_function_name in enumerate(config.translation_function_names):
 				pairs, word_descr = globals()[translation_function_name](word)
-				
+
 				if not len(pairs):
 					pairs = [['', '[Not found]']]
 					#return
@@ -1565,7 +1585,7 @@ class main_class(QWidget):
 						pairs = pairs[-config.number_of_translations:]
 						if len(config.translation_function_names) == 1:
 							config.scroll[word] -= 1
-				
+
 				for i1, pair in enumerate(pairs):
 					if i1 == config.number_of_translations:
 						break
@@ -1573,7 +1593,7 @@ class main_class(QWidget):
 					if config.split_long_lines_in_popup_B:
 						pair[0] = split_long_lines(pair[0], max_symbols_per_line = config.split_long_lines_in_popup_symbols_min)
 						pair[1] = split_long_lines(pair[1], max_symbols_per_line = config.split_long_lines_in_popup_symbols_min)
-					
+
 					if pair[0] == '-':
 						pair[0] = ''
 					if pair[1] == '-':
@@ -1583,7 +1603,7 @@ class main_class(QWidget):
 						# ~pair[0] = pair[0][::-1]
 					# ~if config.R2L_to_B:
 						# ~pair[1] = pair[1][::-1]
-					
+
 					if pair[0] != '':
 						# to emphasize the exact form of the word
 						# to ignore case on input and match it on output
@@ -1614,7 +1634,7 @@ class main_class(QWidget):
 						ll = QLabel(pair[1])
 						ll.setObjectName("second_line")
 						self.popup_vbox.addWidget(ll)
-						
+
 						# padding
 						ll = QLabel()
 						ll.setStyleSheet("font-size: 6px;")
@@ -1634,10 +1654,10 @@ class main_class(QWidget):
 
 		self.popup_inner.adjustSize()
 		self.popup.adjustSize()
-		
+
 		w = self.popup.geometry().width()
 		h = self.popup.geometry().height()
-		
+
 		if w > config.screen_width:
 			w = config.screen_width - 20
 
@@ -1659,12 +1679,12 @@ class main_class(QWidget):
 
 		self.popup.setGeometry(x, y, w, 0)
 		self.popup.show()
-		
+
 		QApplication.restoreOverrideCursor()
 
 if __name__ == "__main__":
 	print('[py part] Starting interSubs ...')
-	
+
 	try:
 		os.mkdir('urls')
 	except:
@@ -1675,10 +1695,13 @@ if __name__ == "__main__":
 
 	mpv_socket = sys.argv[1]
 	sub_file = sys.argv[2]
+	# sub_file = '/tmp/mpv_sub_'
+	# mpv_socket = '/tmp/mpv_socket_'
+
 	subs = ''
-	
+
 	app = QApplication(sys.argv)
-	
+
 	config.avoid_resuming = False
 	config.block_popup = False
 	config.scroll = {}

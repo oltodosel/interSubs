@@ -1,4 +1,4 @@
--- v. 2.5
+-- v. 2.7
 -- Interactive subtitles for `mpv` for language learners.
 --
 -- default keybinding to start/stop: F5
@@ -23,6 +23,16 @@ pyname = '~/.config/mpv/scripts/interSubs.py'
 
 ------------------------------------------------------
 
+debug = false
+-- debug = true
+
+if debug == true then
+	start_command = ''
+	start_command = 'terminator -e \'python3 "%s" "%s" "%s"; sleep 33\''
+end
+
+------------------------------------------------------
+
 function s1()
 	if running == true then
 		s_rm()
@@ -32,7 +42,12 @@ function s1()
 	running = true
 	mp.msg.warn('Starting interSubs ...')
 	mp.register_event("end-file", s_rm)
-	rnbr = math.random(11111111,99999999)
+	rnbr = math.random(11111111, 99999999)
+
+	if debug == true then
+		rnbr = ''
+	end
+
 	mpv_socket_2 = mpv_socket .. '_' .. rnbr
 	sub_file_2 =  sub_file .. '_' .. rnbr
 	
@@ -67,6 +82,7 @@ end
 
 function s_rm()
 	running = false
+	hidden = false
 	mp.msg.warn('Quitting interSubs ...')
 
 	mp.set_property("sub-visibility", sbv)
@@ -83,6 +99,8 @@ function started()
 	if mp.get_property("sub") == 'no' then
 		return true
 	end
+	
+	hidden = false
 
 	for kk, pp in pairs(autostart_in) do
 		if mp.get_property("path"):lower():find(pp:lower()) or mp.get_property("working-directory"):lower():find(pp:lower()) then
