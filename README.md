@@ -134,6 +134,6 @@ Changelog
 * 2.7
 	* Fixed residual flickering of previous lines during subtitles change. Began to happen at qt5.12 or so.
 * 2.8
-	* Fixed gtts, pons pronounciation.
+	* Fixed gtts/pons pronunciation.
 	* Fixed google-translation.
 	
