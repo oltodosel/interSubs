@@ -27,11 +27,11 @@ pth = os.path.expanduser('~/.config/mpv/scripts/')
 os.chdir(pth)
 import interSubs_config as config
 
+pons_combos = ['enes', 'enfr', 'deen', 'enpl', 'ensl', 'defr', 'dees', 'deru', 'depl', 'desl', 'deit', 'dept', 'detr', 'deel', 'dela', 'espl', 'frpl', 'itpl', 'plru', 'essl', 'frsl', 'itsl', 'enit', 'enpt', 'enru', 'espt', 'esfr', 'delb', 'dezh', 'enzh', 'eszh', 'frzh', 'denl', 'arde', 'aren', 'dade', 'csde', 'dehu', 'deno', 'desv', 'dede', 'dedx']
+
 # returns ([[word, translation]..], [morphology = '', gender = ''])
 # pons.com
 def pons(word):
-	pons_combos = ['enes', 'enfr', 'deen', 'enpl', 'ensl', 'defr', 'dees', 'deru', 'depl', 'desl', 'deit', 'dept', 'detr', 'deel', 'dela', 'espl', 'frpl', 'itpl', 'plru', 'essl', 'frsl', 'itsl', 'enit', 'enpt', 'enru', 'espt', 'esfr', 'delb', 'dezh', 'enzh', 'eszh', 'frzh', 'denl', 'arde', 'aren', 'dade', 'csde', 'dehu', 'deno', 'desv', 'dede', 'dedx']
-
 	if config.lang_from + config.lang_to in pons_combos:
 		url = 'http://en.pons.com/translate?q=%s&l=%s%s&in=%s' % (quote(word), config.lang_from, config.lang_to, config.lang_from)
 	else:
@@ -110,21 +110,17 @@ def pons(word):
 # https://github.com/ssut/py-googletrans
 class TokenAcquirer(object):
 	"""Google Translate API token generator
-
 	translate.google.com uses a token to authorize the requests. If you are
 	not Google, you do have this token and will have to pay for use.
 	This class is the result of reverse engineering on the obfuscated and
 	minified code used by Google to generate such token.
-
 	The token is based on a seed which is updated once per hour and on the
 	text that will be translated.
 	Both are combined - by some strange math - in order to generate a final
 	token (e.g. 744915.856682) which is used by the API to validate the
 	request.
-
 	This operation will cause an additional request to get an initial
 	token from translate.google.com.
-
 	Example usage:
 		>>> from googletrans.gtoken import TokenAcquirer
 		>>> acquirer = TokenAcquirer()
@@ -134,19 +130,20 @@ class TokenAcquirer(object):
 		950629.577246
 	"""
 
-	def rshift(self, val, n):
-		"""python port for '>>>'(right shift with padding)
-		"""
-		return (val % 0x100000000) >> n
-
-	RE_TKK = re.compile(r'TKK=eval\(\'\(\(function\(\)\{(.+?)\}\)\(\)\)\'\);',
-						re.DOTALL)
+	RE_TKK = re.compile(r'tkk:\'(.+?)\'', re.DOTALL)
+	RE_RAWTKK = re.compile(r'tkk:\'(.+?)\'', re.DOTALL)
 
 	def __init__(self, tkk='0', session=None, host='translate.google.com'):
 		self.session = session or requests.Session()
 		self.tkk = tkk
 		self.host = host if 'http' in host else 'https://' + host
 
+
+	def rshift(self, val, n):
+		"""python port for '>>>'(right shift with padding)
+		"""
+		return (val % 0x100000000) >> n
+		
 	def _update(self):
 		"""update tkk
 		"""
@@ -156,10 +153,19 @@ class TokenAcquirer(object):
 			return
 
 		r = self.session.get(self.host)
+
+		raw_tkk = self.RE_TKK.search(r.text)
+		if raw_tkk:
+			self.tkk = raw_tkk.group(1)
+			return
+
 		# this will be the same as python code after stripping out a reserved word 'var'
-		code = str(self.RE_TKK.search(r.text).group(1)).replace('var ', '')
+		code = unicode(self.RE_TKK.search(r.text).group(1)).replace('var ', '')
 		# unescape special ascii characters such like a \x3d(=)
-		code = code.encode().decode('unicode-escape')
+		if PY3:  # pragma: no cover
+			code = code.encode().decode('unicode-escape')
+		else:  # pragma: no cover
+			code = code.decode('string_escape')
 
 		if code:
 			tree = ast.parse(code)
@@ -207,11 +213,8 @@ class TokenAcquirer(object):
 		returns value given.
 		We won't be needing this because this seems to have been built for
 		code obfuscation.
-
 		the original code of this method is as follows:
-
 		   ... code-block: javascript
-
 			   var ek = function(a) {
 				return function() {
 					return a;
@@ -233,6 +236,19 @@ class TokenAcquirer(object):
 		return a
 
 	def acquire(self, text):
+		a = []
+		# Convert text to ints
+		for i in text:
+			val = ord(i)
+			if val < 0x10000:
+				a += [val]
+			else:
+				# Python doesn't natively use Unicode surrogates, so account for those
+				a += [
+					math.floor((val - 0x10000)/0x400 + 0xD800),
+					math.floor((val - 0x10000)%0x400 + 0xDC00)
+					]
+
 		b = self.tkk if self.tkk != '0' else ''
 		d = b.split('.')
 		b = int(d[0]) if len(d) > 1 else 0
@@ -241,8 +257,8 @@ class TokenAcquirer(object):
 		e = []
 		g = 0
 		size = len(text)
-		for i, char in enumerate(text):
-			l = ord(char)
+		while g < size:
+			l = a[g]
 			# just append if l is less than 128(ascii: DEL)
 			if l < 128:
 				e.append(l)
@@ -253,15 +269,16 @@ class TokenAcquirer(object):
 				else:
 					# append calculated value if l matches special condition
 					if (l & 64512) == 55296 and g + 1 < size and \
-							ord(text[g + 1]) & 64512 == 56320:
+							a[g + 1] & 64512 == 56320:
 						g += 1
-						l = 65536 + ((l & 1023) << 10) + ord(text[g]) & 1023
+						l = 65536 + ((l & 1023) << 10) + (a[g] & 1023) # This bracket is important
 						e.append(l >> 18 | 240)
 						e.append(l >> 12 & 63 | 128)
 					else:
 						e.append(l >> 12 | 224)
 					e.append(l >> 6 & 63 | 128)
-				e.append(l & 63 | 128)
+				e.append(l & 63 | 128)   
+			g += 1
 		a = b
 		for i, value in enumerate(e):
 			a += value
@@ -743,17 +760,26 @@ class Token:
 		if self.token_key is not None:
 			return self.token_key
 
-		timestamp = calendar.timegm(time.gmtime())
-		hours = int(math.floor(timestamp / 3600))
-
 		response = requests.get("https://translate.google.com/")
-		line = response.text.split('\n')[-1]
+		tkk_expr = re.search("(tkk:.*?),", response.text)
+		if not tkk_expr:
+			raise ValueError(
+				"Unable to find token seed! Did https://translate.google.com change?"
+			)
 
-		tkk_expr = re.search(".*?(TKK=.*?;)W.*?", line).group(1)
-		a = re.search("a\\\\x3d(-?\d+);", tkk_expr).group(1)
-		b = re.search("b\\\\x3d(-?\d+);", tkk_expr).group(1)
+		tkk_expr = tkk_expr.group(1)
+		try:
+			# Grab the token directly if already generated by function call
+			result = re.search("\d{6}\.[0-9]+", tkk_expr).group(0)
+		except AttributeError:
+			# Generate the token using algorithm
+			timestamp = calendar.timegm(time.gmtime())
+			hours = int(math.floor(timestamp / 3600))
+			a = re.search("a\\\\x3d(-?\d+);", tkk_expr).group(1)
+			b = re.search("b\\\\x3d(-?\d+);", tkk_expr).group(1)
 
-		result = str(hours) + "." + str(int(a) + int(b))
+			result = str(hours) + "." + str(int(a) + int(b))
+
 		self.token_key = result
 		return result
 
