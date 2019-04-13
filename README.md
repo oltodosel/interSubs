@@ -47,6 +47,7 @@ Requirements
    * numpy (pip/pacman/etc)
    * beautifulsoup4 (pip/pacman/etc)
    * requests (pip/pacman/etc)
+   * python-lxml
    * lua
    * socat
    * pkill
