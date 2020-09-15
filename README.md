@@ -4,12 +4,12 @@ interSubs
 Interactive subtitles for [mpv](https://github.com/mpv-player/mpv), that was made to help study languages.  
 Easily tweaked and customizable.
 
-v. 2.8 - Changelog at the bottom.  
-If Qt version doesn't work for you - use [Tk](https://github.com/oltodosel/interSubs/tree/master/Tk). It is abandoned, but still works.
+v. 2.9 - Changelog at the bottom.  
+If Qt version doesn't work for you - use [Tk](https://github.com/oltodosel/interSubs/tree/master/Tk). It was abandoned(2017), but maybe still works.
 
 ![z 00_00_5 75-00_00_19 96](https://user-images.githubusercontent.com/10230453/38359595-7f56acc0-38d1-11e8-9a65-257466a44e08.gif)
 
-* Supported dictionaries:
+* Supported dictionaries for words:
 	* https://dict.cc/
 	* https://pons.com/
 	* http://reverso.net/
@@ -17,10 +17,15 @@ If Qt version doesn't work for you - use [Tk](https://github.com/oltodosel/inter
 	* https://translate.google.com/
 	* http://morfix.co.il/
 	* https://redensarten-index.de/
+* Supported dictionaries for sentences:
+	* https://www.deepl.com/translator
+	* https://translate.google.com/
+* Supported dictionaries for word pronunciation:
+	* https://forvo.com/
+	* https://pons.com/
+	* https://translate.google.com/
 * Offline \t separated dictionary. [pyglossary](https://github.com/ilius/pyglossary)
-* https://www.deepl.com/translator for whole sentences.
 * http://linguee.com/ redirecting to browser by click.
-* https://forvo.com/, https://pons.com/ or Google for pronouncing single words.
 * Can use multiple dictionaries simultaneously.
 * Reassigning mouse buttons functions in config.
 * Doesn't work with DVD (picture based) subtitles, only the text-based ones.
@@ -42,8 +47,8 @@ Requirements
 ------------
    * mpv 0.27 (I don't know if it will work with mpv front-ends.)
    * python => 3.6
-   * pyqt5 (pip/pacman/etc)
    * composite manager; xcompmgr or sth.
+   * pyqt5 (pip/pacman/etc)
    * numpy (pip/pacman/etc)
    * beautifulsoup4 (pip/pacman/etc)
    * requests (pip/pacman/etc)
@@ -74,8 +79,8 @@ Usage
 
 Buttons bellow may be reassigned in config
 -----
-* Click on the word to look it up on another translator in the browser.
-* Right-click on the word to hear its pronunciation.
+* Left-click - show translation in your browser.
+* Right-click - listen to pronunciation.
 * Wheel - scroll through transitions in popup.
 * Wheel+Ctrl - resize subtitles.
 * Wheel+Shift - change subtitles' vertical position.
@@ -138,4 +143,7 @@ Changelog
 * 2.8
 	* Fixed gtts/pons pronunciation.
 	* Fixed google-translation.
-	
+* 2.9
+	* Added google-translation for full sentences(default mouse Back-click):
+		* `f_translation_full_sentence` to bind to mouse instead of `f_deepl_translation`
+		* in config `translation_function_name_full_sentence = 'google'`
