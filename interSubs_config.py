@@ -1,6 +1,6 @@
 #! /usr/bin/env python
 
-# v. 2.8
+# v. 2.9
 # Interactive subtitles for `mpv` for language learners.
 
 #########################################
