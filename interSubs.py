@@ -1,6 +1,6 @@
 #! /usr/bin/env python
 
-# v. 2.7
+# v. 2.8
 # Interactive subtitles for `mpv` for language learners.
 
 import os, subprocess, sys
@@ -298,11 +298,15 @@ class TokenAcquirer(object):
 
 # translate.google.com
 def google(word):
+	word = word.replace('\n', ' ').strip()
 	url = 'https://translate.google.com/translate_a/single?client=t&sl={lang_from}&tl={lang_to}&hl={lang_to}&dt=at&dt=bd&dt=ex&dt=ld&dt=md&dt=qca&dt=rw&dt=rm&dt=ss&dt=t&ie=UTF-8&oe=UTF-8&otf=1&pc=1&ssel=3&tsel=3&kc=2&q={word}'.format(lang_from = config.lang_from, lang_to = config.lang_to, word = quote(word))
 
 	pairs = []
 	fname = 'urls/' + url.replace('/', "-")
 	try:
+		if ' ' in word:
+			raise Exception('skip saving')
+		
 		p = open(fname).read().split('=====/////-----')
 		try:
 			word_descr = p[1].strip()
@@ -344,7 +348,7 @@ def google(word):
 
 		word_descr = ''
 		# extra check against double-writing from rouge threads
-		if not os.path.isfile(fname):
+		if ' ' not in word and not os.path.isfile(fname):
 			print('\n\n'.join(e[0] + '\n' + e[1] for e in pairs), file=open(fname, 'a'))
 			print('\n'+'=====/////-----'+'\n', file=open(fname, 'a'))
 			print(word_descr, file=open(fname, 'a'))
@@ -658,7 +662,6 @@ def deepl(text):
 	}
 
 	response = requests.post('https://www2.deepl.com/jsonrpc', json=parameters).json()
-	print(response)
 	if 'result' not in response:
 		return 'DeepL call resulted in a unknown result.'
 
@@ -1014,7 +1017,7 @@ def r2l(l):
 		l2 += re.findall('^\W+', l)[0][::-1]
 	except:
 		pass
-
+	
 	return l2
 
 def split_long_lines(line, chunks = 2, max_symbols_per_line = False):
@@ -1076,6 +1079,10 @@ class thread_subtitles(QObject):
 				tmp_file_subs = open(sub_file).read()
 			except:
 				continue
+			
+			# tmp hack
+			# if config.R2L_from_B:
+			# 	tmp_file_subs = r2l(tmp_file_subs.strip())
 
 			if config.extend_subs_duration2max_B and not len(tmp_file_subs):
 				if not config.extend_subs_duration_limit_sec:
@@ -1188,6 +1195,7 @@ class drawing_layer(QLabel):
 				alpha = 200
 			else:
 				alpha = (max(range_width) - width) / max(range_width) * 200
+				alpha = int(alpha)
 
 			blur_color = QColor(outline_color.red(), outline_color.green(), outline_color.blue(), alpha)
 			blur_brush = QBrush(blur_color, Qt.SolidPattern)
@@ -1377,8 +1385,13 @@ class events_class(QLabel):
 		config.auto_pause_min_words += 1
 		mpv_message('auto_pause_min_words: %d' % config.auto_pause_min_words)
 
+	# f_deepl_translation -> f_translation_full_sentence
 	@pyqtSlot()
 	def f_deepl_translation(self, event):
+		self.mouseHover.emit(self.subs , event.globalX(), True)
+	
+	@pyqtSlot()
+	def f_translation_full_sentence(self, event):
 		self.mouseHover.emit(self.subs , event.globalX(), True)
 
 	def f_save_word_to_file(self, event):
@@ -1569,10 +1582,10 @@ class main_class(QWidget):
 		else:
 			y = config.screen_height - config.subs_screen_edge_padding - h
 
-		self.subtitles.setGeometry(x, y, 0, 0)
+		self.subtitles.setGeometry(int(x), int(y), 0, 0)
 		self.subtitles.show()
 
-		self.subtitles2.setGeometry(x, y, 0, 0)
+		self.subtitles2.setGeometry(int(x), int(y), 0, 0)
 		self.subtitles2.show()
 
 	def render_popup(self, text, x_cursor_pos, is_line):
@@ -1585,7 +1598,14 @@ class main_class(QWidget):
 
 		if is_line:
 			QApplication.setOverrideCursor(Qt.WaitCursor)
-			line = deepl(text)
+			
+			line = globals()[config.translation_function_name_full_sentence](text)
+			if config.translation_function_name_full_sentence == 'google':
+				try:
+					line = line[0][0][0].strip()
+				except:
+					line = 'Google translation failed.'
+			
 			if config.split_long_lines_B and len(line.split('\n')) == 1 and len(line.split(' ')) > config.split_long_lines_words_min - 1:
 				line = split_long_lines(line)
 
@@ -1703,7 +1723,7 @@ class main_class(QWidget):
 		else:
 			y = config.screen_height - config.subs_screen_edge_padding - self.subtitles.height - h
 
-		self.popup.setGeometry(x, y, w, 0)
+		self.popup.setGeometry(int(x), int(y), int(w), 0)
 		self.popup.show()
 
 		QApplication.restoreOverrideCursor()

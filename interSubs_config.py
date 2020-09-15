@@ -1,6 +1,6 @@
 #! /usr/bin/env python
 
-# v. 2.7
+# v. 2.8
 # Interactive subtitles for `mpv` for language learners.
 
 #########################################
@@ -25,9 +25,12 @@ lang_to = 'en'
 #	morfix (he/en en/he)
 #	redensarten (redensarten-index.de - German idioms etc.)
 #	tab_divided_dict - simple offline dictionary with word \t translation per line
-translation_function_names = ['dict_cc', 'pons']
+translation_function_names = ['pons', 'reverso']
 # for automatic switch to Hebrew. Skip if it isn't your language.
 translation_function_names_2 = ['google', 'morfix']
+
+# deepl/google
+translation_function_name_full_sentence = 'google'
 
 # number of translations in popup
 number_of_translations = 4
@@ -35,7 +38,7 @@ number_of_translations = 4
 number_of_translations_to_save = 50
 
 # gtts|pons|forvo # gtts is google-text-to-speech
-listen_via = 'gtts'
+listen_via = 'forvo'
 
 # path to the offline dictionary
 tab_divided_dict_fname = '~/d/python_shit/mpv/scripts/z.dict'
@@ -137,7 +140,7 @@ style_subs = '''
 
 		font-family: "American Typewriter";
 		/* font-weight: bold; */
-		font-size: 44px;
+		font-size: 52px;
 	}
 '''
 
@@ -145,11 +148,11 @@ style_subs = '''
 style_popup = '''
 	/* main */
 	QFrame {
-		background: rgba(44, 44, 44);
+		background: rgb(44, 44, 44);
 
 		font-family: "Trebuchet MS";
 		font-weight: bold;
-		font-size: 36px;
+		font-size: 40px;
 	}
 	/* original language */
 	QLabel#first_line {
@@ -246,12 +249,13 @@ hover_underline_thickness = 5
 	# f_font_size_increase
 	# f_auto_pause_min_words_decrease
 	# f_auto_pause_min_words_increase
-	# f_deepl_translation
+	# f_translation_full_sentence
 	# f_save_word_to_file
+	# f_deepl_translation < obsolete, changed into f_translation_full_sentence
 
 mouse_buttons = [
 	['LeftButton',		'NoModifier',		'f_show_in_browser'],
-	['RightButton',		'NoModifier',		'f_deepl_translation'],
+	['RightButton',		'NoModifier',		'f_translation_full_sentence'],
 	['MiddleButton',	'NoModifier',		'f_auto_pause_options'],
 
 	['BackButton',		'NoModifier',		'f_listen'],
@@ -262,8 +266,9 @@ mouse_buttons = [
 	['ScrollDown',		'ControlModifier',		'f_font_size_decrease'],
 	['ScrollUp',		'ControlModifier',		'f_font_size_increase'],
 
-	['ScrollLeft',		'NoModifier',		'f_auto_pause_min_words_decrease'],
-	['ScrollRight',		'NoModifier',		'f_auto_pause_min_words_increase'],
+	# ['ScrollLeft',		'NoModifier',		'f_auto_pause_min_words_decrease'],
+	# ['ScrollRight',		'NoModifier',		'f_auto_pause_min_words_increase'],
+	['ScrollRight',		'NoModifier',		'f_listen'],
 
 	['ScrollDown',		'ShiftModifier',		'f_subs_screen_edge_padding_decrease'],
 	['ScrollUp',		'ShiftModifier',		'f_subs_screen_edge_padding_increase'],
