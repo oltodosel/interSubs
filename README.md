@@ -67,7 +67,7 @@ Installation
 * Edit interSubs.lua to add option where interSubs will start automatically. 
 * For Mac also edit configuration at interSubs.lua
 * On KDE(kwin) go to composite and uncheck "Allow applications to block compositing". [Screenshot](https://iwf1.com/wordpress/wp-content/uploads/2017/09/Disable-applications-override-compositor-KDE.jpg).
-* For Windows - port it yourself. (It does NOT work on Windows.)
+* For Windows - port it yourself. (It does NOT work on Windows. [reason](https://github.com/mpv-player/mpv/blob/master/DOCS/man/ipc.rst#command-prompt-example))
 
 Usage
 -----
