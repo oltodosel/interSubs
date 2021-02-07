@@ -4,7 +4,7 @@ interSubs
 Interactive subtitles for [mpv](https://github.com/mpv-player/mpv), that was made to help study languages.  
 Easily tweaked and customizable.
 
-v. 2.9 - Changelog at the bottom.  
+v. 2.10 - Changelog at the bottom.  
 If Qt version doesn't work for you - use [Tk](https://github.com/oltodosel/interSubs/tree/master/Tk). It was abandoned(2017), but maybe still works.
 
 ![z 00_00_5 75-00_00_19 96](https://user-images.githubusercontent.com/10230453/38359595-7f56acc0-38d1-11e8-9a65-257466a44e08.gif)
@@ -147,3 +147,5 @@ Changelog
 	* Added google-translation for full sentences(default mouse Back-click):
 		* `f_translation_full_sentence` to bind to mouse instead of `f_deepl_translation`
 		* in config `translation_function_name_full_sentence = 'google'`
+* 2.10
+	* Fixed google-translation
