@@ -53,6 +53,7 @@ Requirements
    * beautifulsoup4 (pip/pacman/etc)
    * requests (pip/pacman/etc)
    * python-lxml
+   * python-httpx
    * lua
    * socat
    * pkill
