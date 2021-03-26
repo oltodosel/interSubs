@@ -46,12 +46,12 @@ If Qt version doesn't work for you - use [Tk](https://github.com/oltodosel/inter
 Requirements
 ------------
    * mpv 0.27 (I don't know if it will work with mpv front-ends.)
+   * composite manager; `xcompmgr` or sth.
    * python => 3.6
-   * composite manager; xcompmgr or sth.
-   * pyqt5 (pip/pacman/etc)
-   * numpy (pip/pacman/etc)
-   * beautifulsoup4 (pip/pacman/etc)
-   * requests (pip/pacman/etc)
+   * python-pyqt5
+   * python-numpy
+   * python-beautifulsoup4
+   * python-requests
    * python-lxml
    * python-httpx
    * lua
