@@ -24,7 +24,7 @@ If Qt version doesn't work for you - use [Tk](https://github.com/oltodosel/inter
 	* https://forvo.com/
 	* https://pons.com/
 	* https://translate.google.com/
-* Offline \t separated dictionary. [pyglossary](https://github.com/ilius/pyglossary)
+* Offline \t separated dictionary. [details](https://github.com/oltodosel/interSubs/issues/36#issuecomment-803541985) | [pyglossary](https://github.com/ilius/pyglossary)
 * http://linguee.com/ redirecting to browser by click.
 * Can use multiple dictionaries simultaneously.
 * Reassigning mouse buttons functions in config.
