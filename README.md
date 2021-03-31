@@ -93,6 +93,7 @@ Important
 -----
 * May have issues working in a multi-monitor system.  See [the solution](https://github.com/oltodosel/interSubs/issues/26).
 * On KDE subtitles might sometimes be invisible. See [the solution](https://github.com/oltodosel/interSubs/issues/12#issuecomment-433960146).
+* On KDE subtitles fade instead of appearing immediately. See [the solution](https://github.com/oltodosel/interSubs/issues/39#issuecomment-810483614)
 * Instead of changing system settings you may change [--x11-bypass-compositor](https://mpv.io/manual/stable/#options-x11-bypass-compositor)
 * Stuttering video during subtitles change might be solved by changing mpv's video output `mpv --vo gpu`.
 
