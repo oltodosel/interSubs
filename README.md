@@ -97,6 +97,11 @@ Important
 * Instead of changing system settings you may change [--x11-bypass-compositor](https://mpv.io/manual/stable/#options-x11-bypass-compositor)
 * Stuttering video during subtitles change might be solved by changing mpv's video output `mpv --vo gpu`.
 
+Troubleshooting
+-----
+* Does not work at all - launch `mpv` in a console, then start `interSubs` and see if there are any errors that might indicate on missing packages and install them.
+* Background and subtitles are shown as solid black bars - install/launch a compositor.
+
 Changelog
 -----
 * 2.0a
