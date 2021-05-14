@@ -46,6 +46,7 @@ If Qt version doesn't work for you - use [Tk](https://github.com/oltodosel/inter
 Requirements
 ------------
    * mpv 0.27 (I don't know if it will work with mpv front-ends.)
+   * Xorg
    * composite manager; `xcompmgr` or sth.
    * python => 3.6
    * python-pyqt5
