@@ -97,6 +97,7 @@ Important
 * On KDE subtitles fade instead of appearing immediately. See [the solution](https://github.com/oltodosel/interSubs/issues/39#issuecomment-810483614)
 * Instead of changing system settings you may change [--x11-bypass-compositor](https://mpv.io/manual/stable/#options-x11-bypass-compositor)
 * Stuttering video during subtitles change might be solved by changing mpv's video output `mpv --vo gpu`.
+* On MacOS subtitles are not rendered on top of `mpv`. See [a possible solution](https://github.com/oltodosel/interSubs/issues/42#issuecomment-841725012)
 
 Troubleshooting
 -----
