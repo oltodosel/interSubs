@@ -46,8 +46,8 @@ If Qt version doesn't work for you - use [Tk](https://github.com/oltodosel/inter
 Requirements
 ------------
    * mpv 0.27 (I don't know if it will work with mpv front-ends.)
-   * Xorg
-   * composite manager; `xcompmgr` or sth.
+   * Xorg (ignore for Mac users)
+   * composite manager; `xcompmgr` or sth. (ignore for Mac users)
    * python => 3.6
    * python-pyqt5
    * python-numpy
@@ -69,7 +69,7 @@ Installation
 * Edit `interSubs.lua` to add option where interSubs will start automatically. 
 * For Mac also edit configuration at `interSubs.lua`
 * On KDE(kwin) go to Compositor and uncheck "Allow applications to block compositing". [Screenshot](https://iwf1.com/wordpress/wp-content/uploads/2017/09/Disable-applications-override-compositor-KDE.jpg).
-* For Windows - port it yourself. (It does NOT work on Windows. [reason](https://github.com/mpv-player/mpv/blob/master/DOCS/man/ipc.rst#command-prompt-example))
+* For Windows - port it yourself. (It does NOT work on Windows. [reason](https://github.com/mpv-player/mpv/blob/master/DOCS/man/ipc.rst#command-prompt-example)) and [a possible way to do it](https://github.com/oltodosel/interSubs/issues/40#issuecomment-835767040)). Consider installing VirtualBox and Ubuntu or some other user-friendly distro.
 
 Usage
 -----
