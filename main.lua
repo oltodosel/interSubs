@@ -7,17 +7,28 @@ local python_script_file = os.getenv("HOME").."/.config/mpv/scripts/interSubs.py
 
 local random_number = math.random(11111111, 99999999)
 
+local function put_in_background(cmd) return cmd.." &" end
+
 local function create_mpv_socket_file()
 	-- recomend to have it in tmpfs
-	mpv_socket_file = "/tmp/mpv_socket"
-	mpv_socket_file = mpv_socket_file .. '_' .. random_number
+	mpv_socket_file = "/tmp/mpv_socket"..'_'..random_number
 	mp.set_property("input-ipc-server", mpv_socket_file)
+end
+
+local function destroy_mpv_socket_file()
+	mp.set_property("input-ipc-server", "")
+	os.execute(put_in_background("rm "..mpv_socket_file))
 end
 
 local function create_subs_file()
 	-- recomend to have it in tmpfs
-	subs_file = "/tmp/mpv_sub"
-	subs_file =  subs_file .. '_' .. random_number
+	subs_file = "/tmp/mpv_sub"..'_'..random_number
+	mp.observe_property("sub-text", "string", write_sub_to_file)
+end
+
+local function destroy_subs_file()
+	os.execute(put_in_background("rm "..subs_file))
+	mp.unobserve_property(write_sub_to_file)
 end
 
 local function save_current_subs_settings()
@@ -50,9 +61,9 @@ end
 
 local function release_resources()
 	-- TODO: needs refactoring
-	os.execute('pkill -f "' .. mpv_socket_file .. '" &')
-	os.execute('(sleep 3 && rm "' .. mpv_socket_file .. '") &')
-	os.execute('(sleep 3 && rm "' .. subs_file .. '") &')
+	os.execute(put_in_background("pkill -f "..mpv_socket_file))
+	destroy_mpv_socket_file()
+	destroy_subs_file()
 end
 
 local function start_intersub()
