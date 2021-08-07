@@ -40,8 +40,8 @@ local function create_subs_file()
 end
 
 local function destroy_subs_file()
-	os.execute(put_cmd_in_bg("rm "..subs_file_path))
 	mp.unobserve_property(write_sub_to_file)
+	os.execute(put_cmd_in_bg("rm "..subs_file_path))
 end
 
 local function save_current_subs_settings()
@@ -97,24 +97,16 @@ local function start_intersub()
 	is_running = true
 end
 
-local function on_file_loaded()
-	if mp.get_property("sub") == 'no' then return end
-	
-	run()
-end
-
 local function toggle_subs_visibility()
-	-- TODO: doesn't look like it would work properly..., change it
-	if is_running then
-		if is_visible then
-			os.execute('rm "' .. mpv_socket_file .. '_hide" &')
-			mp.osd_message("Showing interSubs.", .8)
-			is_visible = false
-		else
-			os.execute('touch "' .. mpv_socket_file .. '_hide" &')
-			mp.osd_message("Hiding interSubs.", .8)
-			is_visible = true
-		end
+	if not is_running then return end
+	if is_visible then
+		os.execute(put_cmd_in_bg('touch "'..mpv_socket_file_path..'_hide"'))
+		mp.osd_message("Hiding interSubs.", .8)
+		is_visible = false
+	else
+		os.execute(put_cmd_in_bg('rm "'..mpv_socket_file_path..'_hide"'))
+		mp.osd_message("Showing interSubs.", .8)
+		is_visible = true
 	end
 end
 
@@ -124,6 +116,11 @@ local function run()
 	else
 		start_intersub()
 	end
+end
+
+local function on_file_loaded()
+	if is_there_no_selected_subs() then return end
+	run()
 end
 
 mp.add_forced_key_binding(PLUGIN_TOGGLE_KEYBIND, "start-stop-interSubs", run)
