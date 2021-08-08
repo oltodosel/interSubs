@@ -61,9 +61,10 @@ Requirements
 
 Installation
 ------------
-* `mv interSubs.py interSubs.lua interSubs_config.py ~/.config/mpv/scripts/;`
+* `mv interSubs.py interSubs_config.py ~/.config/mpv/scripts/; mv main.lua ~/.config/mpv/scripts/interSubs.lua`
+  * or `cd ~/.config/mpv/scripts/; git clone "this repository link"`
 * Edit configuration file `interSubs_config.py`
-* Edit `interSubs.lua` to add option where interSubs will start automatically. 
+* Edit the lua file if you want change keybindings and should the plugin auto-start or not. 
 * For Mac also edit configuration at `interSubs.lua`
 * On KDE(kwin) go to Compositor and uncheck "Allow applications to block compositing". [Screenshot](https://iwf1.com/wordpress/wp-content/uploads/2017/09/Disable-applications-override-compositor-KDE.jpg).
 * For Windows - port it yourself. (It does NOT work on Windows. [reason](https://github.com/mpv-player/mpv/blob/master/DOCS/man/ipc.rst#command-prompt-example)) and [a possible way to do it](https://github.com/oltodosel/interSubs/issues/40#issuecomment-835767040)). Consider installing VirtualBox and Ubuntu or some other user-friendly distro.
