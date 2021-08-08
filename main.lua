@@ -1,11 +1,11 @@
 local PLUGIN_TOGGLE_KEYBIND = "F5"
 local VISIBILITY_TOGGLE_KEYBIND = "F6"
+local IS_AUTO_START_ON = false
 -- for Mac change python3 to python or pythonw
 local PYTHON_COMMAND = 'python3 "%s" "%s" "%s"'
 local PYTHON_SCRIPT_FILENAME = "interSubs.py"
 
 local python_script_file_path = mp.get_script_directory().."/"..PYTHON_SCRIPT_FILENAME
-
 local random_number = math.random(11111111, 99999999)
 
 local function put_cmd_in_bg(cmd) return cmd.." &" end
@@ -120,7 +120,9 @@ end
 
 local function on_file_loaded()
 	if is_there_no_selected_subs() then return end
-	run()
+	if IS_AUTO_START_ON then
+		run()
+	end
 end
 
 mp.add_forced_key_binding(PLUGIN_TOGGLE_KEYBIND, "start-stop-interSubs", run)
