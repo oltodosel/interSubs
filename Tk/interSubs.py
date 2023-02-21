@@ -1093,7 +1093,7 @@ exec(open('interSubs.conf.py').read())
 
 pons_combos = ['enes', 'enfr', 'deen', 'enpl', 'ensl', 'defr', 'dees', 'deru', 'depl', 'desl', 'deit', 'dept', 'detr', 'deel', 'dela', 'espl', 'frpl', 'itpl', 'plru', 'essl', 'frsl', 'itsl', 'enit', 'enpt', 'enru', 'espt', 'esfr', 'delb', 'dezh', 'enzh', 'eszh', 'frzh', 'denl', 'arde', 'aren', 'dade', 'csde', 'dehu', 'deno', 'desv', 'dede', 'dedx']
 
-reverso_combos = {'ar':'Arabic', 'de':'German', 'en':'English', 'es':'Spanish', 'fr':'French', 'he':'Hebrew', 'it':'Italian', 'nl':'Dutch', 'pl':'Polish', 'pt':'Portuguese', 'ro':'Romanian', 'ru':'Russian'}
+reverso_combos = {'ar':'Arabic', 'de':'German', 'en':'English', 'es':'Spanish', 'fr':'French', 'he':'Hebrew', 'it':'Italian', 'nl':'Dutch', 'pl':'Polish', 'pt':'Portuguese', 'ro':'Romanian', 'ru':'Russian', 'tr':'Turkish'}
 
 if save_translations_B:
 	try:

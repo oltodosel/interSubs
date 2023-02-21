@@ -488,7 +488,7 @@ def google(word):
 
 # reverso.net
 def reverso(word):
-	reverso_combos = {'ar':'Arabic', 'de':'German', 'en':'English', 'es':'Spanish', 'fr':'French', 'he':'Hebrew', 'it':'Italian', 'nl':'Dutch', 'pl':'Polish', 'pt':'Portuguese', 'ro':'Romanian', 'ru':'Russian'}
+	reverso_combos = {'ar':'Arabic', 'de':'German', 'en':'English', 'es':'Spanish', 'fr':'French', 'he':'Hebrew', 'it':'Italian', 'nl':'Dutch', 'pl':'Polish', 'pt':'Portuguese', 'ro':'Romanian', 'ru':'Russian', 'tr':'Turkish'}
 
 	if not config.lang_from in reverso_combos and not config.lang_to in reverso_combos:
 		return [['Language code is not correct.', '']], ['', '']
