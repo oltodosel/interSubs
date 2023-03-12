@@ -3,25 +3,29 @@
 # v. 2.10
 # Interactive subtitles for `mpv` for language learners.
 
-import os, subprocess, sys
-import random, re, time
-import requests
-import threading, queue
-import calendar, math, base64
-import numpy
 import ast
-
-from bs4 import BeautifulSoup
-
-from urllib.parse import quote
-from json import loads
-
+import base64
+import calendar
+import math
+import os
+import queue
+import random
+import re
+import subprocess
+import sys
+import threading
+import time
 import warnings
-from six.moves import urllib
+from json import loads
+from urllib.parse import quote
 
-from PyQt5.QtCore import Qt, QThread, QObject, pyqtSignal, pyqtSlot, QSize
-from PyQt5.QtWidgets import QApplication, QFrame, QVBoxLayout, QHBoxLayout, QLabel, QSizePolicy, QWidget
-from PyQt5.QtGui import QPalette, QPaintEvent, QPainter, QPainterPath, QFont, QFontMetrics, QColor, QPen, QBrush
+import numpy
+import requests
+from PyQt6.QtCore import Qt, QThread, QObject, pyqtSignal, pyqtSlot, QSize
+from PyQt6.QtGui import QPalette, QPaintEvent, QPainter, QPainterPath, QFontMetrics, QColor, QPen, QBrush
+from PyQt6.QtWidgets import QApplication, QFrame, QVBoxLayout, QHBoxLayout, QLabel, QSizePolicy, QWidget
+from bs4 import BeautifulSoup
+from six.moves import urllib
 
 pth = os.path.expanduser('~/.config/mpv/scripts/')
 os.chdir(pth)
@@ -58,7 +62,9 @@ def pons(word):
                 pairs.append([pi[0], pi[1]])
     except:
         p = requests.get(url, headers={
-            'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.167 Safari/537.36'}).text
+            'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) '
+                          'AppleWebKit/537.36 (KHTML, like Gecko) '
+                          'Chrome/64.0.3282.167 Safari/537.36'}).text
 
         soup = BeautifulSoup(p, "lxml")
         trs = soup.find_all('dl')
@@ -88,9 +94,12 @@ def pons(word):
             word_descr = soup.find_all('h2', class_='')
             if '<i class="icon-bolt">' not in str(word_descr[0]):
                 word_descr = re.sub('\n|\r|\t', ' ', word_descr[0].get_text())
-                word_descr = re.sub(' +', ' ', word_descr).replace('&lt;', '<').replace('&gt;', '>').replace(' · ',
-                                                                                                             '·').replace(
-                    ' , ', ', ').strip()
+                word_descr = re.sub(' +', ' ', word_descr) \
+                    .replace('&lt;', '<') \
+                    .replace('&gt;', '>') \
+                    .replace(' · ', '·') \
+                    .replace(' , ', ', ') \
+                    .strip()
             else:
                 word_descr = ''
         except:
@@ -179,7 +188,8 @@ class TokenAcquirer_DISABLED:
             code = code.encode().decode('unicode-escape')
         except AttributeError:
             raise Exception(
-                'Could not find TKK token for this request.\nSee https://github.com/ssut/py-googletrans/issues/234 for more details.')
+                'Could not find TKK token for this request.\n'
+                'See https://github.com/ssut/py-googletrans/issues/234 for more details.')
         except:
             raise
 
@@ -248,7 +258,7 @@ class TokenAcquirer_DISABLED:
         while c < size_b - 2:
             d = b[c + 2]
             d = ord(d[0]) - 87 if 'a' <= d else int(d)
-            d = rshift(a, d) if '+' == b[c + 1] else a << d
+            d = self.rshift(a, d) if '+' == b[c + 1] else a << d
             a = a + d & 4294967295 if '+' == b[c] else a ^ d
 
             c += 3
@@ -465,7 +475,9 @@ def google(word):
 
         url = '{url}&tk={tk}'.format(url=url, tk=tk)
         p = requests.get(url, headers={
-            'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.167 Safari/537.36'}).text
+            'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) '
+                          'AppleWebKit/537.36 (KHTML, like Gecko) '
+                          'Chrome/64.0.3282.167 Safari/537.36'}).text
         p = loads(p)
 
         try:
@@ -523,7 +535,9 @@ def reverso(word):
                 pairs.append([pi[0], pi[1]])
     except:
         p = requests.get(url, headers={
-            'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.167 Safari/537.36'}).text
+            'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) '
+                          'AppleWebKit/537.36 (KHTML, like Gecko) '
+                          'Chrome/64.0.3282.167 Safari/537.36'}).text
 
         soup = BeautifulSoup(p, "lxml")
         trs = soup.find_all(class_=re.compile('translation.*ltr.*'))
@@ -567,7 +581,9 @@ def linguee(word):
     except:
         # p = open('/home/lom/d/1.html', encoding="ISO-8859-15").read()
         p = requests.get(url, headers={
-            'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.167 Safari/537.36'}).text
+            'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) '
+                          'AppleWebKit/537.36 (KHTML, like Gecko) '
+                          'Chrome/64.0.3282.167 Safari/537.36'}).text
 
         soup = BeautifulSoup(p, "lxml")
         trs = soup.find_all('div', class_="lemma featured")
@@ -608,7 +624,9 @@ def dict_cc(word):
                 pairs.append([pi[0], pi[1]])
     except:
         p = requests.get(url, headers={
-            'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.167 Safari/537.36'}).text
+            'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) '
+                          'AppleWebKit/537.36 (KHTML, like Gecko) '
+                          'Chrome/64.0.3282.167 Safari/537.36'}).text
 
         p = re.sub('<div style="float:right;color:#999">\d*</div>', '', p)
         p = re.sub('<span style="color:#666;font-size:10px;padding:0 2px;position:relative;top:-3px">\d*</span>', '', p)
@@ -640,7 +658,8 @@ def redensarten(word):
         return [], ['', '']
 
     url = 'https://www.redensarten-index.de/suche.php?suchbegriff=' + quote(
-        word) + '&bool=relevanz&gawoe=an&suchspalte%5B%5D=rart_ou&suchspalte%5B%5D=rart_varianten_ou&suchspalte%5B%5D=erl_ou&suchspalte%5B%5D=erg_ou'
+        word) + '&bool=relevanz&gawoe=an&suchspalte%5B%5D=rart_ou&' \
+                'suchspalte%5B%5D=rart_varianten_ou&suchspalte%5B%5D=erl_ou&suchspalte%5B%5D=erg_ou'
 
     pairs = []
     fname = 'urls/' + url.replace('/', "-")
@@ -657,7 +676,9 @@ def redensarten(word):
                 pairs.append([pi[0], pi[1]])
     except:
         p = requests.get(url, headers={
-            'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.167 Safari/537.36'})
+            'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) '
+                          'AppleWebKit/537.36 (KHTML, like Gecko) '
+                          'Chrome/64.0.3282.167 Safari/537.36'})
         p.encoding = 'utf-8'
         p = p.text
 
@@ -693,7 +714,8 @@ def redensarten(word):
 def leo(word):
     language = config.lang_from if config.lang_from != 'de' else config.lang_to
 
-    url = "https://dict.leo.org/dictQuery/m-vocab/%sde/query.xml?tolerMode=nof&rmWords=off&rmSearch=on&searchLoc=0&resultOrder=basic&multiwordShowSingle=on&lang=de&search=%s" % (
+    url = "https://dict.leo.org/dictQuery/m-vocab/%sde/query.xml?tolerMode=nof&rmWords=off&rmSearch=on&searchLoc=0" \
+          "&resultOrder=basic&multiwordShowSingle=on&lang=de&search=%s" % (
         language, word)
 
     pairs = []
@@ -846,7 +868,9 @@ def listen(word, type='gtts'):
                 quote(word), config.lang_to, config.lang_from, config.lang_from)
 
         p = requests.get(url, headers={
-            'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.167 Safari/537.36'}).text
+            'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) '
+                          'AppleWebKit/537.36 (KHTML, like Gecko) '
+                          'Chrome/64.0.3282.167 Safari/537.36'}).text
         x = re.findall('<dl id="([a-zA-Z0-9]*?)" class="dl-horizontal kne(.*?)</dl>', p, re.DOTALL)
         x2 = re.findall('class="audio tts trackable trk-audio" data-pons-lang="(.*?)"', x[0][1])
 
@@ -860,13 +884,16 @@ def listen(word, type='gtts'):
     elif type == 'gtts':
         gTTS(text=word, lang=config.lang_from, slow=False).save('/tmp/gtts_word.mp3')
         os.system(
-            '(mpv --load-scripts=no --loop=1 --volume=75 --force-window=no ' + '/tmp/gtts_word.mp3' + '; rm ' + '/tmp/gtts_word.mp3' + ') &')
+            '(mpv --load-scripts=no --loop=1 --volume=75 --force-window=no ' +
+            '/tmp/gtts_word.mp3' + '; rm ' + '/tmp/gtts_word.mp3' + ') &')
     elif type == 'forvo':
         url = 'https://forvo.com/word/%s/%s/' % (config.lang_from, quote(word))
 
         try:
             data = requests.get(url, headers={
-                'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.167 Safari/537.36'}).text
+                'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) '
+                              'AppleWebKit/537.36 (KHTML, like Gecko) '
+                              'Chrome/64.0.3282.167 Safari/537.36'}).text
 
             soup = BeautifulSoup(data, "lxml")
             trs = soup.find_all('article', class_='pronunciations')[0].find_all('span', class_='play')
@@ -879,7 +906,8 @@ def listen(word, type='gtts'):
                 tr = base64.b64decode(tr)
                 tr = tr.decode("utf-8")
 
-                mp3s += 'mpv --load-scripts=no --loop=1 --volume=111 --force-window=no https://audio00.forvo.com/audios/mp3/%s ; ' % tr
+                mp3s += 'mpv --load-scripts=no --loop=1 --volume=111 --force-window=no ' \
+                        'https://audio00.forvo.com/audios/mp3/%s ; ' % tr
             os.system('(%s) &' % mp3s)
         except:
             return
@@ -1092,7 +1120,9 @@ class gTTS:
                        'tk': self.token.calculate_token(part)}
             headers = {
                 "Referer": "http://translate.google.com/",
-                "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.167 Safari/537.36"
+                "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) "
+                              "AppleWebKit/537.36 (KHTML, like Gecko) "
+                              "Chrome/64.0.3282.167 Safari/537.36"
             }
             if self.debug: print(payload)
             try:
@@ -1337,7 +1367,7 @@ class thread_translations(QObject):
                 continue
 
             # changing cursor to hourglass during translation
-            QApplication.setOverrideCursor(Qt.WaitCursor)
+            QApplication.setOverrideCursor(Qt.CursorShape.WaitCursor)
 
             threads = []
             for translation_function_name in config.translation_function_names:
@@ -1392,22 +1422,34 @@ class drawing_layer(QLabel):
                 alpha = int(alpha)
 
             blur_color = QColor(outline_color.red(), outline_color.green(), outline_color.blue(), alpha)
-            blur_brush = QBrush(blur_color, Qt.SolidPattern)
-            blur_pen = QPen(blur_brush, width, Qt.SolidLine, Qt.RoundCap, Qt.RoundJoin)
+            blur_brush = QBrush(blur_color, Qt.BrushStyle.SolidPattern)
+            blur_pen = QPen(
+                blur_brush,
+                width, Qt.
+                PenStyle.SolidLine,
+                Qt.PenCapStyle.RoundCap,
+                Qt.PenJoinStyle.RoundJoin
+            )
 
             painter.setPen(blur_pen)
             painter.drawPath(text_path)
 
         # draw outline
         outline_color = QColor(outline_color.red(), outline_color.green(), outline_color.blue(), 255)
-        outline_brush = QBrush(outline_color, Qt.SolidPattern)
-        outline_pen = QPen(outline_brush, outline_width, Qt.SolidLine, Qt.RoundCap, Qt.RoundJoin)
+        outline_brush = QBrush(outline_color, Qt.BrushStyle.SolidPattern)
+        outline_pen = QPen(
+                blur_brush,
+                width, Qt.
+                PenStyle.SolidLine,
+                Qt.PenCapStyle.RoundCap,
+                Qt.PenJoinStyle.RoundJoin
+            )
 
         painter.setPen(outline_pen)
         painter.drawPath(text_path)
 
         # draw text
-        color = self.palette().color(QPalette.Text)
+        color = self.palette().color(QPalette.ColorRole.Text)
         painter.setPen(color)
         painter.drawText(x, y, text)
 
@@ -1432,7 +1474,7 @@ class drawing_layer(QLabel):
 
         def resizeEvent(self, *args):
             self.setFixedSize(
-                self.fontMetrics().width(self.line),
+                self.fontMetrics().horizontalAdvance(self.line),
                 self.fontMetrics().height() +
                 config.outline_bottom_padding +
                 config.outline_top_padding
@@ -1440,7 +1482,7 @@ class drawing_layer(QLabel):
 
         def sizeHint(self):
             return QSize(
-                self.fontMetrics().width(self.line),
+                self.fontMetrics().horizontalAdvance(self.line),
                 self.fontMetrics().height()
             )
 
@@ -1466,11 +1508,11 @@ class events_class(QLabel):
 
         if config.hover_underline:
             font_metrics = QFontMetrics(self.font())
-            text_width = font_metrics.width(self.word)
+            text_width = font_metrics.horizontalAdvance(self.word)
             text_height = font_metrics.height()
 
             brush = QBrush(color)
-            pen = QPen(brush, underline_width, Qt.SolidLine, Qt.RoundCap)
+            pen = QPen(brush, underline_width, Qt.PenStyle.SolidLine, Qt.PenCapStyle.RoundCap)
             painter.setPen(pen)
             if not self.skip:
                 painter.drawLine(0, text_height - underline_width, text_width, text_height - underline_width)
@@ -1491,7 +1533,7 @@ class events_class(QLabel):
 
     def resizeEvent(self, event):
         text_height = self.fontMetrics().height()
-        text_width = self.fontMetrics().width(self.word)
+        text_width = self.fontMetrics().horizontalAdvance(self.word)
 
         self.setFixedSize(text_width, text_height + config.outline_bottom_padding + config.outline_top_padding)
 
@@ -1499,7 +1541,7 @@ class events_class(QLabel):
         if not self.skip:
             self.highlight = True
             self.repaint()
-            config.queue_to_translate.put((self.word, event.globalX()))
+            config.queue_to_translate.put((self.word, event.globalPosition().x()))
 
     @pyqtSlot()
     def leaveEvent(self, event):
@@ -1524,14 +1566,14 @@ class events_class(QLabel):
     def wheelEvent(self, event):
         for mouse_action in config.mouse_buttons:
             if self.wheel_scrolling(event.angleDelta()) == mouse_action[0]:
-                if event.modifiers() == eval('Qt.%s' % mouse_action[1]):
+                if event.modifiers() == eval('Qt.KeyboardModifier.%s' % mouse_action[1]):
                     exec('self.%s(event)' % mouse_action[2])
 
     def mousePressEvent(self, event):
         for mouse_action in config.mouse_buttons:
             if 'Scroll' not in mouse_action[0]:
-                if event.button() == eval('Qt.%s' % mouse_action[0]):
-                    if event.modifiers() == eval('Qt.%s' % mouse_action[1]):
+                if event.button() == eval('Qt.MouseButton.%s' % mouse_action[0]):
+                    if event.modifiers() == eval('Qt.KeyboardModifier.%s' % mouse_action[1]):
                         exec('self.%s(event)' % mouse_action[2])
 
     #####################################################
@@ -1594,11 +1636,9 @@ class events_class(QLabel):
         self.mouseHover.emit(self.subs, event.globalX(), True)
 
     def f_save_word_to_file(self, event):
-        if (os.path.isfile(os.path.expanduser(config.save_word_to_file_fname)) and self.word not in [x.strip() for x in
-                                                                                                     open(
-                                                                                                         os.path.expanduser(
-                                                                                                             config.save_word_to_file_fname)).readlines()]) or not os.path.isfile(
-            os.path.expanduser(config.save_word_to_file_fname)):
+        if (os.path.isfile(os.path.expanduser(config.save_word_to_file_fname)) and self.word not in
+            [x.strip() for x in open(os.path.expanduser(config.save_word_to_file_fname)).readlines()]) or not \
+                os.path.isfile(os.path.expanduser(config.save_word_to_file_fname)):
             print(self.word, file=open(os.path.expanduser(config.save_word_to_file_fname), 'a'))
 
     @pyqtSlot()
@@ -1664,8 +1704,8 @@ class main_class(QWidget):
 
     def subtitles_base(self):
         self.subtitles = QFrame()
-        self.subtitles.setAttribute(Qt.WA_TranslucentBackground)
-        self.subtitles.setWindowFlags(Qt.X11BypassWindowManagerHint)
+        self.subtitles.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground)
+        self.subtitles.setWindowFlags(Qt.WindowType.X11BypassWindowManagerHint)
         self.subtitles.setStyleSheet(config.style_subs)
 
         self.subtitles_vbox = QVBoxLayout(self.subtitles)
@@ -1674,8 +1714,8 @@ class main_class(QWidget):
 
     def subtitles_base2(self):
         self.subtitles2 = QFrame()
-        self.subtitles2.setAttribute(Qt.WA_TranslucentBackground)
-        self.subtitles2.setWindowFlags(Qt.X11BypassWindowManagerHint)
+        self.subtitles2.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground)
+        self.subtitles2.setWindowFlags(Qt.WindowType.X11BypassWindowManagerHint)
         self.subtitles2.setStyleSheet(config.style_subs)
 
         self.subtitles_vbox2 = QVBoxLayout(self.subtitles2)
@@ -1690,8 +1730,8 @@ class main_class(QWidget):
 
     def popup_base(self):
         self.popup = QFrame()
-        self.popup.setAttribute(Qt.WA_TranslucentBackground)
-        self.popup.setWindowFlags(Qt.X11BypassWindowManagerHint)
+        self.popup.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground)
+        self.popup.setWindowFlags(Qt.WindowType.X11BypassWindowManagerHint)
         self.popup.setStyleSheet(config.style_popup)
 
         self.popup_inner = QFrame()
@@ -1804,7 +1844,7 @@ class main_class(QWidget):
         self.clearLayout('popup')
 
         if is_line:
-            QApplication.setOverrideCursor(Qt.WaitCursor)
+            QApplication.setOverrideCursor(Qt.CursorShape.WaitCursor)
 
             line = globals()[config.translation_function_name_full_sentence](text)
             if config.translation_function_name_full_sentence == 'google':
@@ -1881,7 +1921,7 @@ class main_class(QWidget):
 
                         # filling the rest of the line with empty bg
                         ll = QLabel()
-                        ll.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
+                        ll.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Preferred)
                         hbox.addWidget(ll)
 
                         self.popup_vbox.addLayout(hbox)
@@ -1899,7 +1939,7 @@ class main_class(QWidget):
                 if len(word_descr[0]):
                     ll = QLabel(word_descr[0])
                     ll.setProperty("morphology", word_descr[1])
-                    ll.setAlignment(Qt.AlignRight)
+                    ll.setAlignment(Qt.AlignmentFlag.AlignRight)
                     self.popup_vbox.addWidget(ll)
 
                 # delimiter between dictionaries
@@ -1929,7 +1969,7 @@ class main_class(QWidget):
                 x = config.screen_width - w
 
         if config.subs_top_placement_B:
-            y = self.subtitles.height + config.subs_screen_edge_padding
+            y = self.subtitles.height() + config.subs_screen_edge_padding
         else:
             y = config.screen_height - config.subs_screen_edge_padding - self.subtitles.height - h
 
@@ -1968,4 +2008,4 @@ if __name__ == "__main__":
     config.screen_height = app.primaryScreen().size().height()
 
     form = main_class()
-    app.exec_()
+    app.exec()
