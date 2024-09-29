@@ -103,6 +103,7 @@ Troubleshooting
 * Stuttering video during subtitles change might be solved by changing mpv's video output `mpv --vo gpu`.
 * On MacOS subtitles are not rendered on top of `mpv`. See [a possible solution](https://github.com/oltodosel/interSubs/issues/42#issuecomment-841725012)
 * On MacOS subtitles are not rendered on top of `mpv` only in fullscreen mode. See [the solution](https://github.com/oltodosel/interSubs/issues/42#issuecomment-841746404)
+* Xfce4 - subtitles do not show - https://github.com/oltodosel/interSubs/issues/54
 
 Changelog
 -----
