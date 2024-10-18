@@ -51,7 +51,7 @@ Requirements
    * Xorg (ignore for Mac users)
    * composite manager; `xcompmgr` or sth. (ignore for Mac users)
    * python => 3.6
-   * python-pyqt5
+   * python-pyqt6
    * python-numpy
    * python-beautifulsoup4
    * python-requests
@@ -112,8 +112,8 @@ Changelog
 	* Tk is abandoned in favor of Qt.
 		* Background can be fully transparent or semi/fully opaque.
 		* Rendering is faster than with Tk.
-		* requires pyqt5 for python 3
-			* `pip install pyqt5` / `pacman -S python-pyqt5`
+		* requires pyqt6 for python 3
+			* `pip install pyqt6` / `pacman -S python-pyqt6`
 		* requires composite manager for not solid bg; `xcompmgr` or sth.
 		* tested on Openbox, i3, KDE(kwin).
 		* On KDE(kwin) go to composite and uncheck "Allow applications to block compositing". [screenshot](https://iwf1.com/wordpress/wp-content/uploads/2017/09/Disable-applications-override-compositor-KDE.jpg)
@@ -159,3 +159,5 @@ Changelog
 		* in config `translation_function_name_full_sentence = 'google'`
 * 2.10
 	* Fixed google-translation
+* 2.11
+	* Switched to pyqt6
