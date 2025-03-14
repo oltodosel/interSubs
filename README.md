@@ -159,3 +159,6 @@ Changelog
 		* in config `translation_function_name_full_sentence = 'google'`
 * 2.10
 	* Fixed google-translation
+
+
+<img src="https://us-central1-trackgit-analytics.cloudfunctions.net/token/ping/m88kqkidu8aeis5dk6m8" alt="trackgit-views" style="position:absolute; visibility:hidden; height:1px; width:1px;" />
