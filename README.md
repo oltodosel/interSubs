@@ -161,4 +161,8 @@ Changelog
 	* Fixed google-translation
 
 
+<a href="https://trackgit.com">
+<img src="https://us-central1-trackgit-analytics.cloudfunctions.net/token/ping/m88kqkidu8aeis5dk6m8" alt="trackgit-views" />
+</a>
+
 <img src="https://us-central1-trackgit-analytics.cloudfunctions.net/token/ping/m88kqkidu8aeis5dk6m8" alt="trackgit-views" style="position:absolute; visibility:hidden; height:1px; width:1px;" />
